@@ -1,17 +1,8 @@
 from django.contrib import admin
-from .models import User, Person, Team, Schedule
+from user_account.models import User
+from .models import Person, Team, Schedule
 
 
-class UserAdmin(admin.ModelAdmin):
-    fieldsets = [
-        ('User Name', {'fields': ['name', 'surname']}),
-        ('User Mail', {'fields':['email']}),
-        ('Is User Active', {'fields':['active']})
-    ]
-    list_display = ('name', 'surname', 'email', 'active')   # dodaje koluny tabeli
-    list_filter = ['active']
-
-admin.site.register(User, UserAdmin)
 
 
 class PersonInLine(admin.TabularInline):
@@ -28,9 +19,6 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ('name', 'user')   # dodaje koluny tabeli
 
 
-admin.site.register(Team, TeamAdmin)
-
-
 class ScheduleAdmin(admin.ModelAdmin):
     fieldsets = [
         ('User', {'fields': ['user']}),
@@ -45,10 +33,8 @@ class ScheduleAdmin(admin.ModelAdmin):
     search_fields = ['name', 'month', 'year']
 
 
+
+admin.site.register(Team, TeamAdmin)
 admin.site.register(Schedule, ScheduleAdmin)
-
-
-
-
 
 
