@@ -45,6 +45,10 @@ class Team(models.Model):
     def __str__(self):
         return 'Team {}'.format(self.name)
 
+    def get_team_names_from_db(self):
+        pass
+
+
 
 class Schedule(models.Model):
 

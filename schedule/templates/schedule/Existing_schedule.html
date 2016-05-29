@@ -1,0 +1,43 @@
+{% extends "base_schedule.html" %}
+{% block table %}
+
+<table style="width:100%">
+    <tr>
+        <td></td>
+        {% for no, day in month_calendar %}
+        <td><b>{{no}}</b></td>
+        {% endfor %}
+    </tr>
+
+    <tr>
+        <td><b>Imię Nazwisko</b></td>
+        {% for no, day in month_calendar  %}
+        <td><b>{{day}}</b></td>
+        {% endfor %}
+    </tr>
+    {% for person, person_schedule in person_schedules %}
+    <tr>
+        <td>{{person}}</td>
+
+        {% for no, day in month_calendar %}
+        <td>
+            <select name="{{person}}_day{{no}}">
+
+                {% for w in work %}
+                    {% if person_schedule[no-1] == w %}
+                    <option value="{{w}}" SELECTED><b>{{w}}</b></option>
+                    {% endif %}
+
+                    {% if person_schedule[no-1] != w %}
+                    <option value="{{w}}">{{w}}</option>
+                    {% endif %}
+                {% endfor %}
+
+            </select>
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
