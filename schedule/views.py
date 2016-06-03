@@ -1,16 +1,21 @@
-from django.shortcuts import render
-from .models import Team, Schedule
-# Create your views here.
+# -*- coding: utf-8 -*-
+#!/usr/bin/python
+__author__ = 'Marcin Pieczyński'
 
+from django.shortcuts import render, HttpResponseRedirect, redirect
+from django.core.urlresolvers import reverse
+from django.views import generic
+
+from .models import *
 
 import datetime
 import calendar
 
 
-MONTHS = [
-    u"styczeń", u"luty", u"marzec", u"kwiecień", u"maj", u"czerwiec", u"lipiec",
-    u"sierpień", u"wrzesień", u"październik", u"listopad", u"grudzień"
-]
+MONTHS = {
+    1: u"styczeń", 2: u"luty", 3: u"marzec", 4: u"kwiecień", 5: u"maj", 6: u"czerwiec",
+    7: u"lipiec", 8: u"sierpień", 9: u"wrzesień", 10: u"październik", 11: u"listopad", 12: u"grudzień"
+}
 
 WEEK_DAYS = {
     0: u"pn", 1: u"wt", 2: u"śr", 3: u"cz", 4: u"pt", 5: u"so", 6: u"n"
@@ -58,57 +63,174 @@ def now():
 
 
 def current_month():
-    current_date = now()
-    return MONTHS[now().month-1]
+    return MONTHS[now().month]
 
 
 def current_year():
-    current_date = now()
-    return current_date.year
+    return now().year
 
 
-def get_team_names_from_db():
-    teams = Team.objects.all()
-    return [team.name for team in teams]
+MAIN_CONTEXT = {
+    'months': MONTHS.values(),
+    'years': YEARS,
+    'current_month': current_month(),
+    'current_year': current_year(),
+    'size': range(TEAM_SIZE),
+    'teams': get_teams_from_db(),    # zwraca obiekty Team !!!!
+    'schedule_names': get_schedule_names_from_db()
+}
 
 
-def get_schedule_names_from_db():
-    schedules = Schedule.objects.all()
-    return [schedule.name for schedule in schedules]
-
-
-def main_page(request):
-    context = {
-        'months': MONTHS,
+def main_context():
+    main_context = {
+        'months': MONTHS.values(),
         'years': YEARS,
         'current_month': current_month(),
         'current_year': current_year(),
-        'team_names': get_team_names_from_db(),
+        'size': range(TEAM_SIZE),
+        'teams': get_teams_from_db(),  # zwraca obiekty Team !!!!
         'schedule_names': get_schedule_names_from_db()
     }
+    return main_context
+
+
+# widok podstawowy
+def main_page(request):
+    context = MAIN_CONTEXT
     return render(request, 'schedule/base.html', context)
 
 
 def grafik_update(request):
-    pass
 
-# def index(request):
-#     latest_question_list = Question.objects.order_by('-pub_date')[:5]
-#     context = {
-#         'latest_question_list': latest_question_list
-#     }
-#     return render(request, 'polls/index.html', context)
+    if request.POST:
+
+        # Otwieranie okna służącego do wprowadzenia nowej załogi
+        if "_new_team" in request.POST:
+
+            # wyświetla stronę w celu utworzenia nowego zespołu
+            context = main_context()
+            print("NEW TEAM")
+            return render(request, 'schedule/new_team.html', context)
+
+        # Otwieranie okna służącego do edycji istniejącej załogi
+        elif "_edit_team" in request.POST:   # DO UZUPEŁNIENIA !!!!!!!!!!!!1
+            print("EDYCJA TEAM")
+            try:
+                team_to_edit = request.POST["edit_team"]
+                print("team_to_edit", team_to_edit)
+                team_to_edit = get_team_from_db(team_to_edit)
+
+                context = main_context()
+                context['Team'] = team_to_edit
+
+                print("RENDEROWANIE STRONY Z EDYCJĄ TEAM", "Edycja team", team_to_edit, team_to_edit.pk)
+
+                # a_crew = Team.Person_set.all()
+                # print("a_crew", a_crew)
+                # return HttpResponse('schedule:read_team')
+                # return render(request, 'schedule/team.html', context)
+                return HttpResponseRedirect(reverse('schedule:read_team', args=(team_to_edit.pk,)))
+
+                # return redirect('schedule/team.html', {'Team': team_to_edit})
+
+            except:
+                print("WYJĄTEK podczas edycji team")
 
 
-# @app.route('/GrafikIwonki', methods=['GET', 'POST'])     # Pierwsza strona
-# def main_page():
-#     return render_template('Grafik Iwonki.html',
-#                            months        = MONTHS,
-#                            years         = YEARS,
-#                            current_month = CURRENT_MONTH,
-#                            current_year  = CURRENT_YEAR,
-#                            team_names    = get_team_names_from_db(),
-#                            schedule_names= get_schedule_names_from_db())
+        elif "_remove_team" in request.POST:
+            # usuwanie istniejącej załogi z bazy danych
+            context = main_context()
+            try:
+                team_to_remove = request.POST["edit_team"]
+                remove_team(team_to_remove)
+                context = main_context()
+                # context['teams']=get_teams_from_db()
+
+            except KeyError:
+                context["error_message"] = "Wystąpił błąd podczas usuwania drużyny. " \
+                                           "Najprawdopodobniej drużyna została już wcześniej " \
+                                           "usunięta albo nie zapisana."
+
+            return render(request, 'schedule/base.html', context)
+
+
+
+
+class TeamDetailView(generic.DetailView):
+    model = Team
+    template_name = 'schedule/team.html'
+
+
+
+def team_update(request):
+
+    if request.POST:
+        if "save_team" in request.POST:
+
+
+            print("request.POST", request.POST)
+            context = main_context()
+            try:
+                print("czytanie nazwy team")
+                team_name = request.POST["team_name"].strip()
+
+                print("czytanie crew")
+                crew, no = [], 0
+                while 1:
+                    person = request.POST["person" + str(no)].strip()
+                    if not person:
+                        pass
+                    else:
+                        crew.append(person)
+                    no += 1
+
+            except KeyError:
+                print("KeyError 1")
+                # wyświetlenie strony do wprowadzenia zespołu OD NOWA
+                # return render(request, 'schedule/new_team.html', context)
+
+            if not team_name and not crew:
+                context["error_message"] = "Wprowadź nazwę dla zespołu oraz imiona i nazwiska osób w zespole."
+                return render(request, "schedule/new_team.html", context)
+
+            elif not team_name:
+                context["error_message"] = "Wprowadź nazwę dla zespołu."
+                return render(request, "schedule/new_team.html", context)
+
+            elif not crew:
+                context["error_message"] = "Należy wprowadzić imiona i nazwiska osób w zespołe."
+                return render(request, "schedule/new_team.html", context)
+
+            try:
+                save_team_to_db(team_name, crew)
+                print("ZAPISANE !!!!!!!!!!!!!!!!", team_name, crew)
+            except:
+                 pass # wyświetlenie strony z info team o danej nazwie juz istnieje !!!!!!!!!
+
+            team = get_team_from_db(team_name)
+            return HttpResponseRedirect(reverse('schedule:read_team'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

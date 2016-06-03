@@ -1,17 +1,17 @@
-{% extends "Grafik Iwonki.html" %}
+{% extends "schedule/base.html" %}
 {% block body %}
 
 
-
-<form action="{{url_for('team_update')}}" method="post" id="team">
+<form action="{% url 'schedule:team_update' %}" method="post">
+{% csrf_token %}
 
 <p> Wprowadź nazwę dla zespołu. Domyślnie będzie ona zawierała dzisiejszą datę ale wprowadź coś od siebie. </p>
 Tutaj wpisz nazwę dla zespołu -->
-<input type="text" name="team_name" value="{{team_name}}" size="50">
+<input type="text" name="team_name" value="{{Team.name}}" size="50">
 <p></p>
 <input type="submit" name="create_team" value="dodaj osobę">
 <input type="submit" name="create_team" value="odejmij osobę">
-<input type="submit" name="create_team" value="Zapisz załogę">
+<input type="submit" name="save_team" value="Zapisz załogę">
 <p></p>
 
 
@@ -21,10 +21,10 @@ Tutaj wpisz nazwę dla zespołu -->
     <td>Liczba</td>
     <td>Imię Nazwisko</td>
     </tr>
-    {% for n in range(size)%}
+    {% for person in Team.Person_set.all %}
     <tr>
-        <td>{{n + 1}}</td>
-        <td><input type="text" name="person{{n}}" value="{{crew[n]}}"></td>
+        <td>{{forloop.counter}}</td>
+        <td><input type="text" name="person{{n}}" value="{{person}}"></td>
     </tr>
     {% endfor %}
 </table>

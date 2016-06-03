@@ -1,7 +1,6 @@
-{% extends "Grafik Iwonki.html" %}
+
+{% extends "schedule/base.html" %}
 {% block body %}
-
-
 <script>
 function myCreateFunction() {
     var table = document.getElementById("team_table");
@@ -10,7 +9,6 @@ function myCreateFunction() {
     var cell2 = row.insertCell(1);
     cell1.innerHTML = "NEW CELL1";
     cell2.innerHTML = "NEW CELL2";
-
 }
 
 function myDeleteFunction() {
@@ -19,7 +17,9 @@ function myDeleteFunction() {
 </script>
 
 
-<form action="{{url_for('team_update')}}" method="post" id="team">
+
+<form action="{% url 'schedule:team_update' %}" method="post">
+{% csrf_token %}
 
 <p> Wprowadź nazwę dla zespołu. Domyślnie będzie ona zawierała dzisiejszą datę ale wprowadź coś od siebie. </p>
 Tutaj wpisz nazwę dla zespołu -->
@@ -27,7 +27,7 @@ Tutaj wpisz nazwę dla zespołu -->
 <p></p>
 <input type="submit" name="create_team" value="dodaj osobę">
 <input type="submit" name="create_team" value="odejmij osobę">
-<input type="submit" name="create_team" value="Zapisz załogę">
+<input type="submit" name="save_team" value="Zapisz załogę">
 
 
 <p></p>
@@ -37,13 +37,13 @@ Tutaj wpisz nazwę dla zespołu -->
         <td>Liczba</td>
         <td>Imię Nazwisko</td>
     </tr>
-    {% for n in range(size)%}
+    {% for n in size%}
         <tr>
-            <td>{{n + 1}}</td>
-            <td><input type="text" name="person{{n}}" value=""></td>
+            <td>{{forloop.counter}}</td>
+            <td><input type="text" name="person{{forloop.counter0}}" value=""></td>
         </tr>
     {% endfor %}
 </table>
 </form>
-
 {% endblock %}
+
