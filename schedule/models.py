@@ -3,18 +3,7 @@
 __author__ = 'Marcin Pieczyński'
 
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
 from user_account.models import User
-
-
-# from prototype.cf.models import Movie
-
-# from  import User
-
-# from production import models as production_models
-# class Car(models.Model):
-#     manufacturer = models.ForeignKey(production_models.Manufacturer)
-
 
 
 months = (
@@ -33,7 +22,7 @@ months = (
 )
 
 years = (
-    ('2016','2016'),
+    ('2016', '2016'),
     ('2017', '2017'),
     ('2018', '2018'),
     ('2019', '2019'),
@@ -41,15 +30,11 @@ years = (
 )
 
 
-
-
-
 class Team(models.Model):
 
     name = models.CharField(max_length=200, unique=True, null=False)
     creation_date = models.DateTimeField(auto_now=False, auto_now_add=True)
     user = models.ForeignKey(User, null=True)
-
 
     def __str__(self):
         return 'Team {}'.format(self.name)
@@ -77,9 +62,6 @@ class Person(models.Model):
         return 'Person {}'.format(self.name)
 
 
-
-
-
 def get_teams_from_db():
     """ Zwraca listę z obiektami Team. """
     return [team for team in Team.objects.all()]
@@ -102,41 +84,20 @@ def save_team_to_db(team_name, crew):
     Zapisuje team do bazy, Jako arg przyjmuje instancję Team.
     Jeżeli dany wpis w db już istnieje, usuwa poprzedni wpis i tworzy nowy.
     """
+    a_team = Team(name=team_name)
+    a_team.save()
+    print("Dokonano ZApisu TEAM", a_team.name)
+
     person_list = [Person(name=name) for name in crew]
     for person in person_list:
+        person.crew = a_team
         person.save()
-
-    a_team = Team(name=team_name)
-    for person in person_list:
-        a_team.crew = person
-
-    a_team.save()
-
-
-
-
-
-
-
-
-
-
+        print("Dokonano ZApisu Person", person.name)
 
 
 def get_schedule_names_from_db():
     """ Zwraca listę stringów z nazwami schedules. """
     return [schedule.name for schedule in Schedule.objects.all()]
-
-
-
-
-
-
-
-
-
-
-
 
 
 def save_schedule_to_db(schedule):
@@ -147,22 +108,11 @@ def save_schedule_to_db(schedule):
     pass
 
 
-
-
-def delete_team_in_db(team_name_to_delete):
-    """
-    Usuwa wpis dla podanego team z bazy danych.
-    """
-    pass
-
 def delete_schedule_in_db(schedule_name_to_delete):
     """
     Usuwa wpis dla podanego schedule z bazy danych.
     """
     pass
-
-
-
 
 
 def get_schedule_from_db(schedule_name_to_read):

@@ -17,13 +17,12 @@ function myDeleteFunction() {
 </script>
 
 
-
 <form action="{% url 'schedule:team_update' %}" method="post">
 {% csrf_token %}
 
 <p> Wprowadź nazwę dla zespołu. Domyślnie będzie ona zawierała dzisiejszą datę ale wprowadź coś od siebie. </p>
 Tutaj wpisz nazwę dla zespołu -->
-<input type="text" name="team_name" value="{{today}}" size="50">
+<input type="text" name="team_name" value="{{default_team_name}}" size="50">
 <p></p>
 <input type="submit" name="create_team" value="dodaj osobę">
 <input type="submit" name="create_team" value="odejmij osobę">
@@ -32,15 +31,15 @@ Tutaj wpisz nazwę dla zespołu -->
 
 <p></p>
 
-<table id="team_table" style="width:100%">
+<table id="team_table" name="team_table" style="width:100%">
     <tr>
         <td>Liczba</td>
         <td>Imię Nazwisko</td>
     </tr>
-    {% for n in size%}
+    {% for elem in dafault_team_size%}
         <tr>
             <td>{{forloop.counter}}</td>
-            <td><input type="text" name="person{{forloop.counter0}}" value=""></td>
+            <td><input type="text" name="person{{forloop.counter0}}" value="{{elem}}"></td>
         </tr>
     {% endfor %}
 </table>

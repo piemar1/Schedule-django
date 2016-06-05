@@ -7,7 +7,8 @@
 
 <p> Wprowadź nazwę dla zespołu. Domyślnie będzie ona zawierała dzisiejszą datę ale wprowadź coś od siebie. </p>
 Tutaj wpisz nazwę dla zespołu -->
-<input type="text" name="team_name" value="{{Team.name}}" size="50">
+
+<input type="text" name="team_name" value="{{team.name}}" size="50">
 <p></p>
 <input type="submit" name="create_team" value="dodaj osobę">
 <input type="submit" name="create_team" value="odejmij osobę">
@@ -15,16 +16,15 @@ Tutaj wpisz nazwę dla zespołu -->
 <p></p>
 
 
-
-<table style="width:100%">
+<table id="team_table" name="team_table" style="width:100%">
     <tr>
     <td>Liczba</td>
     <td>Imię Nazwisko</td>
     </tr>
-    {% for person in Team.Person_set.all %}
+    {% for person in team.person_set.all %}
     <tr>
         <td>{{forloop.counter}}</td>
-        <td><input type="text" name="person{{n}}" value="{{person}}"></td>
+        <td><input type="text" name="person{{forloop.counter0}}" value="{{person.name}}"></td>
     </tr>
     {% endfor %}
 </table>
