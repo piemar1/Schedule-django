@@ -21,9 +21,13 @@
 			<input type="submit" name="_new_team" value="Utwórz nową załogę">
 
 			<p><select name="edit_team">
-			   {% for team in teams %}
-				<option value="{{team.name}}">{{team.name}}</option>
-			   {% endfor %}
+				{% if teams %}
+				   {% for team in teams %}
+					<option value="{{team.name}}">{{team.name}}</option>
+				   {% endfor %}
+                {% else %}
+				    <option value="">Brak zespołów w bazie danych</option>
+				{% endif %}
 			</select><--Wybierz załogę, którą chcesz edytować albo usunąć.</p>
 
 			<p>
@@ -43,8 +47,7 @@
 				{% for month in months %}
 					{% if month == current_month %}
 					<option value="{{month}}"SELECTED>{{month}}</option>
-					{% endif %}
-					{% if month != current_month %}
+                    {% else %}
 					<option value="{{month}}">{{month}}</option>
 					{% endif %}
 				{% endfor %}
@@ -54,19 +57,23 @@
 				{% for year in years %}
 					{% if year == current_year %}
 					<option value="{{year}}"SELECTED>{{year}}</option>
-					{% endif %}
-					{% if year != current_year %}
+					{% else %}
 					<option value="{{year}}">{{year}}</option>
 					{% endif %}
 				{% endfor %}
 				</select>
 			    <select name="team_for_new_schedule">
-			        {% for team_name in team_names %}
-				    <option value="{{team_name}}">{{team_name}}</option>
-			        {% endfor %}
-			    </select>
+					{% if teams %}
+					   {% for team in teams %}
+						<option value="{{team.name}}">{{team.name}}</option>
+					   {% endfor %}
+					{% else %}
+						<option value="">Brak zespołów w bazie danych</option>
+					{% endif %}
+			       </select>
 
-				<p><input type="submit" name="grafik_update" value="Stwórz nowy grafik"></p>
+
+				<p><input type="submit" name="_new_schedule" value="Stwórz nowy grafik"></p>
 		</div>
 
 		<div id="edit_schedules">
@@ -79,8 +86,8 @@
 		        {% endfor %}
 		    </select>
             <p></p>
-            <input type="submit" name="grafik_update" value="Edycja grafiku">
-			<input type="submit" name="grafik_update" value="Usunięcie grafiku">
+            <input type="submit" name="_edit_schedule" value="Edycja grafiku">
+			<input type="submit" name="_remove_schedule" value="Usunięcie grafiku">
 
 		</div>
 

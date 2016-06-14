@@ -9,8 +9,16 @@ from . import views
 urlpatterns = [
     # ex: /polls/
     url(r'^$', views.main_page, name='main_page'),
+
     url(r'^grafik_update/$', views.grafik_update, name='grafik_update'),
+    url(r'^new_team/$', views.new_team, name='new_tem'),
+    url(r'^new_schedule/$', views.new_schedule, name='new_schedule'),
+
+    url(r'^(?P<pk>[0-9]+)/team/$', views.TeamDetailView.as_view(), name='team'),
+    url(r'^(?P<pk>[0-9]+)/schedule/$', views.ScheduleDetailView.as_view(), name='schedule'),
+
     url(r'^team_update/$', views.team_update, name='team_update'),
-    url(r'^(?P<pk>[0-9]+)/read_team/$', views.TeamDetailView.as_view(), name='read_team'),
+    url(r'^schedule_update/$', views.schedule_update, name='schedule_update'),
 
 ]
+

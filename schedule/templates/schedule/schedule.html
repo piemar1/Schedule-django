@@ -1,4 +1,4 @@
-{% extends "base_schedule.html" %}
+{% extends "schedule/base_schedule.html" %}
 {% block table %}
 
 <table style="width:100%">
@@ -15,21 +15,19 @@
         <td><b>{{day}}</b></td>
         {% endfor %}
     </tr>
-    {% for person, person_schedule in person_schedules %}
+    {% for person, one_schedule in schedule.oneschedule_set.all %}
     <tr>
-        <td>{{person}}</td>
+        <td>{{person.name}}</td>
 
         {% for no, day in month_calendar %}
         <td>
-            <select name="{{person}}_day{{no}}">
+            <select name="{{person.name}}_day{{no}}">
 
                 {% for w in work %}
-                    {% if person_schedule[no-1] == w %}
-                    <option value="{{w}}" SELECTED><b>{{w}}</b></option>
-                    {% endif %}
-
-                    {% if person_schedule[no-1] != w %}
-                    <option value="{{w}}">{{w}}</option>
+                    {% if one_schedule == w %}
+                        <option value="{{w}}" SELECTED><b>{{w}}</b></option>
+                    {% else %}
+                        <option value="{{w}}">{{w}}</option>
                     {% endif %}
                 {% endfor %}
 

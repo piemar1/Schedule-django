@@ -1,6 +1,6 @@
 from django.contrib import admin
 from user_account.models import User
-from .models import Person, Team, Schedule
+from .models import Person, Team, Schedule, OneSchedule
 
 
 
@@ -26,12 +26,10 @@ class ScheduleAdmin(admin.ModelAdmin):
         ('Month', {'fields': ['month']}),
         ('Year', {'fields': ['year']}),
         ('Team',{'fields': ['crew']}),
-        ('Schedule', {'fields': ['schedule']}),
     ]
     list_display = ('name', 'user', 'crew', 'month', 'year')   # dodaje koluny tabeli
     list_filter = ['user']
     search_fields = ['name', 'month', 'year']
-
 
 
 admin.site.register(Team, TeamAdmin)
