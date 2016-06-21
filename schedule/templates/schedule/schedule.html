@@ -15,25 +15,22 @@
         <td><b>{{day}}</b></td>
         {% endfor %}
     </tr>
-    {% for person, one_schedule in schedule.oneschedule_set.all %}
-    <tr>
-        <td>{{person.name}}</td>
+    {% for person_name, small_schedule in small_schedules %}
+            <td>{{person_name}}</td>
 
-        {% for no, day in month_calendar %}
-        <td>
-            <select name="{{person.name}}_day{{no}}">
-
-                {% for w in work %}
-                    {% if one_schedule == w %}
-                        <option value="{{w}}" SELECTED><b>{{w}}</b></option>
-                    {% else %}
-                        <option value="{{w}}">{{w}}</option>
-                    {% endif %}
-                {% endfor %}
-
-            </select>
-        </td>
-        {% endfor %}
+            {% for day in small_schedule %}
+            <td>
+                <select name="{{person_name}}_day{{forloop.counter}}">
+                    {% for w in work %}
+                        {% if day == w %}
+                            <option value="{{w}}" SELECTED><b>{{w}}</b></option>
+                        {% else %}
+                            <option value="{{w}}">{{w}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </td>
+            {% endfor %}
     </tr>
     {% endfor %}
 </table>

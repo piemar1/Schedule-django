@@ -6,10 +6,10 @@
 
     <p> Wprowadź nazwę dla Grafiku. Domyślnie zawiera on wybrany miesiąc i rok dla tworzenia grafiku, oraz nazwę zespołu.
     <p></p>
-    {% if not schedule %}
+    {% if not current_schedule %}
     <p><input type="text" name="schedule_name" value="{{selected_year}} {{selected_month}} {{team.name}}" size="50"></p>
     {% else %}
-    <p><input type="text" name="schedule_name" value="{{schedule.name}}" size="50"></p>
+    <p><input type="text" name="schedule_name" value="{{current_schedule.name}}" size="50"></p>
     {% endif %}
 
     <p>Liczba osób na dyżurze -- w dzień>
@@ -45,24 +45,11 @@
         {% endfor %}
     </select></p>
 
-
-    <p>Liczba godzin pracy w miesiącu na jedną osobę -->
-    <select name="no_of_working_days_per_person">
-        {% for elem in working_days_number %}
-            {% if elem == no_of_daywork %}
-            <option value="{{elem}}" SELECTED>{{elem}}</option>
-            {% else %}
-            <option value="{{elem}}">{{elem}}</option>
-            {% endif %}
-        {% endfor %}
-    </select></p>
-
-
     <p>Ważne! - program domyślnie uniemożliwia wprowadzenie dużuru 24h - liczba możliwych dyżurów w ciągu 7 dni --> 4
     <p>
     <input type="submit" name="_fill_schedule" value="Uzupełnij Grafik Automatycznie !">
     <input type="submit" name="_save_schedule" value="Zapisz Grafik w bazie danych">
-    <input type="submit" name="_export_schedule" value="Zapisz w formacie PDF">
+    <input type="submit" name="_export_schedule_as_pdf" value="Zapisz w formacie PDF">
 
 
 {% block table %} {% endblock %}

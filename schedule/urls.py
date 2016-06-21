@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^new_schedule/$', views.new_schedule, name='new_schedule'),
 
     url(r'^(?P<pk>[0-9]+)/team/$', views.TeamDetailView.as_view(), name='team'),
-    url(r'^(?P<pk>[0-9]+)/schedule/$', views.ScheduleDetailView.as_view(), name='schedule'),
+    url(r'^(?P<pk>[0-9]+)/schedule/$', views.existed_schedule, name='existed_schedule'),
 
     url(r'^team_update/$', views.team_update, name='team_update'),
     url(r'^schedule_update/$', views.schedule_update, name='schedule_update'),

@@ -7,20 +7,18 @@ from django.core.urlresolvers import reverse
 from django.views import generic
 from django.contrib.sessions.models import Session
 
+from django.http import HttpResponse
+
 from .models import *
 import datetime
 import calendar
 
 
 """
-
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 uporządkować if i else w template w html !!!!!!!!!!!!!!!!!!!!!!!!
 
-
 """
-
 
 
 
@@ -33,27 +31,22 @@ WEEK_DAYS = {
     0: u"pn", 1: u"wt", 2: u"śr", 3: u"cz", 4: u"pt", 5: u"so", 6: u"n"
 }
 
-WORKING_DAYS_NUMBER_TEXT = {
-    10: "6 x dyżur 12h + 3h 50",
-    11: "6 x dyżur 12h + 11h 25",
-    12: "7 x dyżur 12h + 7h 0",
-    13: "8 x dyżur 12h + 2h 35",
-    14: "8 x dyżur 12h + 10h 10",
-    15: "9 x dyżur 12h + 5h 45",
-    16: "10 x dyżur 12h + 1h 20",
-    17: "10 x dyżur 12h + 8h 55",
-    18: "11 x dyżur 12h + 4h 30",
-    19: "12 x dyżur 12h + 0h 05",
-    20: "12 x dyżur 12h + 7h 40",
-    21: "13 x dyżur 12h + 3h 15",
-    22: "13 x dyżur 12h + 10h 50",
-    23: "14 x dyżur 12h + 6h 25",
-    24: "15 x dyżur 12h + 2h 0"
-}
-
-WORKING_DAYS_NUMBERS = {
-    10: 7, 11: 7, 12: 8, 13: 9, 14: 9, 15: 10, 16: 11, 17: 11,
-    18: 12, 19: 13, 20: 13, 21: 14, 22: 14, 23: 15, 24: 16
+WORKING_DAYS_NUMBER = {
+    10: [7, "6 x dyżur 12h + 3h 50"],
+    11: [7, "6 x dyżur 12h + 11h 25"],
+    12: [8, "7 x dyżur 12h + 7h 0"],
+    13: [9, "8 x dyżur 12h + 2h 35"],
+    14: [9, "8 x dyżur 12h + 10h 10"],
+    15: [10, "9 x dyżur 12h + 5h 45"],
+    16: [11, "10 x dyżur 12h + 1h 20"],
+    17: [11, "10 x dyżur 12h + 8h 55"],
+    18: [12, "11 x dyżur 12h + 4h 30"],
+    19: [13, "12 x dyżur 12h + 0h 05"],
+    20: [13, "12 x dyżur 12h + 7h 40"],
+    21: [14, "13 x dyżur 12h + 3h 15"],
+    22: [14, "13 x dyżur 12h + 10h 50"],
+    23: [15, "14 x dyżur 12h + 6h 25"],
+    24: [16, "15 x dyżur 12h + 2h 0"]
 }
 
 DEFAULT_TEAM = ["" for elem in range(15)]
@@ -119,8 +112,8 @@ def main_context():
         'years': YEARS,
         'current_month': current_month(),
         'current_year': current_year(),
-        'teams': get_teams_from_db(),
-        'schedule_names': get_schedule_names_from_db(),
+        'teams': Team.objects.all(),
+        'schedules': Schedule.objects.all(),
         'default_team_name': today(),
         'default_schedule_name': today(),
         'dafault_team_size': DEFAULT_TEAM,
@@ -129,8 +122,7 @@ def main_context():
         'dafoult_no_of_person_night': 2,
         'dafoult_no_of_person_day': 4,
         'work': WORK,
-        "working_days_number_text": WORKING_DAYS_NUMBER_TEXT.values(),
-        "working_days_number": WORKING_DAYS_NUMBERS.values(),
+        "working_days_number_text": [el[1] for el in WORKING_DAYS_NUMBER.values()],
     }
     return default_context
 
@@ -147,9 +139,6 @@ def new_team(request):
     return render(request, 'schedule/new_team.html', context)
 
 
-
-
-
 # działanie przycisków w głównym oknie programu
 def grafik_update(request):
 
@@ -164,7 +153,7 @@ def grafik_update(request):
         # Otwieranie okna służącego do edycji istniejącej załogi
         elif "_edit_team" in request.POST:
             try:
-                team_to_edit = get_team_from_db(request.POST["edit_team"])
+                team_to_edit = Team.objects.get(name=request.POST["edit_team"])
 
                 # print("RENDEROWANIE STRONY Z EDYCJĄ TEAM", "Edycja team", team_to_edit, team_to_edit.pk)
                 return HttpResponseRedirect(reverse('schedule:team', args=(team_to_edit.pk,)))
@@ -175,8 +164,8 @@ def grafik_update(request):
         # usuwanie istniejącej załogi z bazy danych
         elif "_remove_team" in request.POST:
             try:
-                team_name_to_remove = request.POST["edit_team"]
-                remove_team(team_name_to_remove)
+                team = Team.objects.get(name=request.POST["edit_team"])
+                team.delete()
 
             except KeyError:
                 context = main_context()
@@ -195,12 +184,7 @@ def grafik_update(request):
                 selected_month = request.POST['month']
                 selected_year = int(request.POST['year'])
                 team_name_for_new_schedule = request.POST["team_for_new_schedule"]
-
                 month_calendar = get_month_calendar(selected_year, selected_month)
-                no_of_daywork = WORKING_DAYS_NUMBERS[get_number_of_working_days_month(month_calendar)]
-
-                print(team_name_for_new_schedule, selected_year, selected_month, no_of_daywork)
-
 
                 request.session["team_name"] = team_name_for_new_schedule
                 request.session["month_calendar"] = month_calendar
@@ -215,8 +199,8 @@ def grafik_update(request):
         elif "_remove_schedule" in request.POST:
             print("Usuwanie grafiku pracy z DB")
             try:
-                schedule_name_to_remove =  request.POST["schedule_to_edit"]
-                remove_schedule(schedule_name_to_remove)
+                schedule = Schedule.objects.get(name=request.POST["schedule_to_edit"])
+                schedule.delete()
                 return HttpResponseRedirect('/schedule/')
 
             except KeyError:
@@ -226,16 +210,12 @@ def grafik_update(request):
                                            "usunięty albo nie zapisany."
                 return render(request, 'schedule/base.html', context)
 
-
         elif "_edit_schedule" in request.POST:
             try:
-                schedule_to_edit = get_schedule_from_db(request.POST["schedule_to_edit"])
+                schedule_to_edit = Schedule.objects.get(name=request.POST["schedule_to_edit"])
 
-                print("schedule_to_edit.crew !!!!!!!!!!!!!!!!!!!!")
-                print(schedule_to_edit.crew.person_set.all())
-                print("RENDEROWANIE STRONY Z EDYCJĄ SCHEDULE", "schedule_to_edit", schedule_to_edit , schedule_to_edit .pk)
-
-                return HttpResponseRedirect(reverse('schedule:schedule', args=(schedule_to_edit.pk,)))
+                # print("RENDEROWANIE STRONY Z EDYCJĄ SCHEDULE", "schedule_to_edit", schedule_to_edit , schedule_to_edit .pk)
+                return HttpResponseRedirect('/schedule/' + str(schedule_to_edit.pk) + '/schedule/')
 
             except (KeyError, Schedule.DoesNotExist):
                 return render(request, 'schedule/base.html', context)
@@ -247,35 +227,40 @@ def new_schedule(request):
     context["month_calendar"] = request.session["month_calendar"]
     context["selected_month"] = request.session["selected_month"]
     context["selected_year"] = request.session["selected_year"]
+    context['team'] = Team.objects.get(name=request.session["team_name"])
+    context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(request.session["month_calendar"])
+                              ][1]
 
-    context["working_days"] = WORKING_DAYS_NUMBER_TEXT[
-                                  get_number_of_working_days_month(request.session["month_calendar"])
-                              ]
-    context["no_of_daywork"] = WORKING_DAYS_NUMBERS[
-                                   get_number_of_working_days_month(request.session["month_calendar"])
-                               ]
-
-    team_for_new_schedule = get_team_from_db(request.session["team_name"])
-    context['team'] = team_for_new_schedule
     return render(request, 'schedule/new_schedule.html', context)
 
 
-class ScheduleDetailView(generic.DetailView):
-    model = Schedule
-    template_name = 'schedule/schedule.html'
+# widok istniejącego grafiku
+def existed_schedule(request, pk):
 
-    def get_context_data(self, **kwargs):
+    current_schedule = Schedule.objects.get(pk=pk)
 
+    month_calendar = current_schedule.get_month_calendar()
+    one_schedules = current_schedule.oneschedule_set.all()
+    small_schedules = [[one_schedule.person.name, one_schedule.one_schedule] for one_schedule in one_schedules]
 
-        # implementuje get_context_date z Clasy generic.DetailView
-        context = super(ScheduleDetailView, self).get_context_data(**kwargs)
+    request.session["team_name"] = current_schedule.crew.name
+    request.session["selected_month"] = current_schedule.month
+    request.session["selected_year"] = current_schedule.year
+    request.session["month_calendar"] = month_calendar
 
-        context["month_calendar"] = Schedule.get_month_calendar()
+    context = main_context()
+    context["month_calendar"] = month_calendar
+    context["current_schedule"] = current_schedule
+    context["small_schedules"] = small_schedules
+    context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
 
-        # Dodaje pozostałą zawartość do context
-        context.update(main_context())
-        return context
+    # print(month_calendar)
+    # print(current_schedule.month)
+    # print(current_schedule.year)
+    # print(current_schedule.oneschedule_set.all())
+    # print(small_schedules)
 
+    return render(request, 'schedule/schedule.html', context)
 
 
                     # widok istniejących zespołów
@@ -329,9 +314,17 @@ def team_update(request):
                 return render(request, "schedule/new_team.html", context)
 
             try:
-                if team_name in get_teams_from_db():
-                    remove_team(team_name)
-                save_team_to_db(team_name, crew)
+                if team_name in Team.objects.all():
+                    team = Team.objects.get(name=team_name)
+                    team.delete()
+
+                a_team = Team(name=team_name)
+                a_team.save()
+
+                person_list = [Person(name=name) for name in crew]
+                for person in person_list:
+                    person.crew = a_team
+                    person.save()
 
             except:
                 context["error_message"] = "Błąd podczas zapisu zespołu, sprawdź czy zespół o nazwie" \
@@ -340,7 +333,7 @@ def team_update(request):
                 context["dafault_team_size"] = crew
                 return render(request, "schedule/new_team.html", context)
 
-            team = get_team_from_db(team_name)
+            team = Team.objects.get(name=team_name)
             return HttpResponseRedirect(reverse('schedule:team', args=(team.pk,)))
 
 
@@ -349,56 +342,125 @@ def schedule_update(request):
 
     if request.POST:
 
+        selected_month = request.session["selected_month"]
+        selected_year = request.session["selected_year"]
+        month_calendar = request.session["month_calendar"]
+
+        schedule_name = request.POST['schedule_name']
+        team_for_new_schedule = Team.objects.get(name=request.session["team_name"])
+
+        crew = team_for_new_schedule.person_set.all()
+
+        # odczytywanie ze strony grafiku dla poszczególnych osób
+        schedules = []
+        for person in crew:
+            person_schedule = []
+            for no, day in month_calendar:
+                one_day = request.POST[person.name + u'_day' + str(no)]
+                person_schedule.append(one_day)
+            schedules.append("".join(person_schedule))
+
         # zapisywanie grafiku
         if "_save_schedule" in request.POST:
 
-            selected_month = request.session["selected_month"]
-            selected_year = request.session["selected_year"]
-            month_calendar = request.session["month_calendar"]
-            schedule_name = request.POST['schedule_name']
-            team_for_new_schedule = get_team_from_db(request.session["team_name"])
-            crew = team_for_new_schedule.person_set.all()
-
-            # odczytywanie ze strony grafiku dla poszczególnych osób
-            schedules = []
-            for person in crew:
-                person_schedule = []
-                for no, day in month_calendar:
-                    one_day = request.POST[person.name + u'_day' + str(no)]
-                    person_schedule.append(one_day)
-                schedules.append("".join(person_schedule))
-
-            # print(selected_month)
-            # print(selected_year)
-            # print(month_calendar)
-            # print(schedule_name)
-            # print(team_for_new_schedule)
-            # print(crew)
-            # print(schedules)
+            # usunięcie grafiku z bazy, jeśli istnieje już grafik o takiej nazwie
+            if schedule_name in [schedule.name for schedule in Schedule.objects.all()]:
+                schedule_to_delete = Schedule.objects.get(name=schedule_name)
+                schedule_to_delete.delete()
 
             # stworzenie obiektu nowego grafiku
-            new_schedule = Schedule(
+            current_schedule = Schedule(
                 name=schedule_name,
                 year=selected_year,
                 month=selected_month,
                 crew=team_for_new_schedule
             )
-            new_schedule.save()
+            # zapisuwanie grafiku do bazy danych
+            current_schedule.save()
 
-            for person, person_schedule in zip(crew, schedules):
-                one = OneSchedule(one_schedule=person_schedule,
-                            schedule=new_schedule,
-                            person=person)
-                one.save()
+            # tworzenie obiektów OneSchedule wewnątrz grafiku
+            one_schedules = [OneSchedule(one_schedule=person_schedule, schedule=current_schedule, person=person) for
+                             person, person_schedule in zip(crew, schedules)]
 
-            print("ZAPISANO NOWY GRAFIK W DB")
+            # zapisywanie obiektów OneSchedule wewnątrz grafiku do basy danych
+            for one_schedule in one_schedules:
+                one_schedule.save()
+
+            return HttpResponseRedirect('/schedule/' + str(current_schedule.pk) + '/schedule/')
+
+        if "_export_schedule_as_pdf" in request.POST:
+
+            import io
+            from .write_pdf import WritePDF
+
+            # tworzenie obiektów OneSchedule wewnątrz grafiku
+            one_schedules = [OneSchedule(one_schedule=person_schedule, person=person) for
+                             person, person_schedule in zip(crew, schedules)]
+
+            month_working_days = request.POST["no_of_working_days_in_nonth"]
+
+            # month_working_days zwraca np "10 x dyżur 12h + 8h 55" a ja mam dostać 11
+
+            no_of_workdays = ""
+            for value in WORKING_DAYS_NUMBER.values():
+                if month_working_days in value:
+                    no_of_workdays = value[0]
+
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="grafik.pdf"'
+
+            buffor = io.BytesIO()
+            pdf_buffor = WritePDF(buffor, selected_year, selected_month, one_schedules,
+                                  month_calendar, month_working_days, no_of_workdays)
+
+            pdf_buffor.run()
+            pdf = buffor.getvalue()
+            buffor.close()
+            response.write(pdf)
+
+            return response
+
+        if "_fill_schedule" in request.POST:
 
 
+            person_per_day = int(request.POST["no_of_person_day"])
+            person_per_night = int(request.POST["no_of_person_night"])
+            month_working_days = request.POST["no_of_working_days_in_nonth"]
+
+            no_of_workdays = ""
+            for value in WORKING_DAYS_NUMBER.values():     # tę pętelkę można przerobić na ofobnego def jest używany w 2 miejscach
+                if month_working_days in value:
+                    no_of_workdays = value[0]
+
+            one_schedules = [OneSchedule(one_schedule=person_schedule, person=person) for
+                             person, person_schedule in zip(crew, schedules)]
+
+            from .fill_schedule import fill_the_schedule
+
+            number_of_tries = 1
+            while number_of_tries:
+                try:
+                    print("POCZĄTEK WYPEŁNIANIA GRAFIKU !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                    new_one_schedules = fill_the_schedule(one_schedules,
+                                                          no_of_workdays,
+                                                          person_per_day,
+                                                          person_per_night)
+
+                    for one_schedule in new_one_schedules:
+                        print(one_schedule.person.name[:3], one_schedule.one_schedule)
+
+                    small_schedules = [[one_schedule.person.name, one_schedule.one_schedule] for one_schedule in
+                                       new_one_schedules]
+
+                    context = main_context()
+                    context["month_calendar"] = request.session["month_calendar"]
+                    context["small_schedules"] = small_schedules
+                    return render(request, 'schedule/schedule.html', context)
 
 
-
-
-
+                except IndexError:
+                    print("WYJĄTEK @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+                    number_of_tries -= 1
 
 
 

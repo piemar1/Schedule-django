@@ -81,8 +81,8 @@
 			<p>Lista istniejących już gafików do wyboru</p>
 
     	    <select name="schedule_to_edit">
-		        {% for schedule_name in schedule_names %}
-			    <option value="{{schedule_name}}">{{schedule_name}}</option>
+		        {% for schedule in schedules %}
+			    <option value="{{schedule.name}}">{{schedule.name}}</option>
 		        {% endfor %}
 		    </select>
             <p></p>
