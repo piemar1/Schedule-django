@@ -36,44 +36,41 @@
 			</p>
 		</div>
 
-
-
 		<div id="new_schedule">
-				<p><b>Tworzenie nowego grafiku pracy.</b></p>
-				<p>Wybierz miesiąc, rok oraz drużynę </p>
-			    <p>dla której chcesz ułożyć nowy grafik.</p>
+            <p><b>Tworzenie nowego grafiku pracy.</b></p>
+            <p>Wybierz miesiąc, rok oraz drużynę </p>
+            <p>dla której chcesz ułożyć nowy grafik.</p>
 
-				<select name="month">
-				{% for month in months %}
-					{% if month == current_month %}
-					<option value="{{month}}"SELECTED>{{month}}</option>
-                    {% else %}
-					<option value="{{month}}">{{month}}</option>
-					{% endif %}
-				{% endfor %}
-				</select>
+            <select name="month">
+            {% for month in months %}
+                {% if month == current_month %}
+                <option value="{{month}}"SELECTED>{{month}}</option>
+                {% else %}
+                <option value="{{month}}">{{month}}</option>
+                {% endif %}
+            {% endfor %}
+            </select>
 
-				<select name="year">
-				{% for year in years %}
-					{% if year == current_year %}
-					<option value="{{year}}"SELECTED>{{year}}</option>
-					{% else %}
-					<option value="{{year}}">{{year}}</option>
-					{% endif %}
-				{% endfor %}
-				</select>
-			    <select name="team_for_new_schedule">
-					{% if teams %}
-					   {% for team in teams %}
-						<option value="{{team.name}}">{{team.name}}</option>
-					   {% endfor %}
-					{% else %}
-						<option value="">Brak zespołów w bazie danych</option>
-					{% endif %}
-			       </select>
+            <select name="year">
+            {% for year in years %}
+                {% if year == current_year %}
+                <option value="{{year}}"SELECTED>{{year}}</option>
+                {% else %}
+                <option value="{{year}}">{{year}}</option>
+                {% endif %}
+            {% endfor %}
+            </select>
+            <select name="team_for_new_schedule">
+                {% if teams %}
+                   {% for team in teams %}
+                    <option value="{{team.name}}">{{team.name}}</option>
+                   {% endfor %}
+                {% else %}
+                    <option value="">Brak zespołów w bazie danych</option>
+                {% endif %}
+               </select>
 
-
-				<p><input type="submit" name="_new_schedule" value="Stwórz nowy grafik"></p>
+            <p><input type="submit" name="_new_schedule" value="Stwórz nowy grafik"></p>
 		</div>
 
 		<div id="edit_schedules">
@@ -88,9 +85,7 @@
             <p></p>
             <input type="submit" name="_edit_schedule" value="Edycja grafiku">
 			<input type="submit" name="_remove_schedule" value="Usunięcie grafiku">
-
 		</div>
-
         </form>
     </div>
 
@@ -100,6 +95,9 @@
     <p><strong>{{ error_message }}</strong></p>
 {% endif %}
 
+{% if message %}
+    <p><strong>{{ message }}</strong></p>
+{% endif %}
 
 {% block body %}
 {% endblock %}

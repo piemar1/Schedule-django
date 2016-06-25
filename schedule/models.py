@@ -2,50 +2,13 @@
 #!/usr/bin/python
 __author__ = 'Marcin Pieczyński'
 
-# kolejność importów: najpierw libki Pythonowe, zainstalowane biblioteki, na końcu importy lokalne
 import calendar
-
 from django.db import models
-
 from user_account.models import User
-
-
-months = (
-    (u"styczeń", u"styczeń"),
-    (u"luty", u"luty"),
-    (u"marzec", u"marzec"),
-    (u"kwiecień", u"kwiecień"),
-    (u"maj", u"maj"),
-    (u"czerwiec", u"czerwiec"),
-    (u"lipiec", u"lipiec"),
-    (u"sierpień", u"sierpień"),
-    (u"wrzesień", u"wrzesień"),
-    (u"październik", u"październik"),
-    (u"listopad", u"listopad"),
-    (u"grudzień", u"grudzień")
-)
-
-years = (
-    ('2016', '2016'),
-    ('2017', '2017'),
-    ('2018', '2018'),
-    ('2019', '2019'),
-    ('2020', '2020')
-)
-
-MONTHS = [
-    u"styczeń", u"luty", u"marzec", u"kwiecień", u"maj", u"czerwiec", u"lipiec",
-    u"sierpień", u"wrzesień", u"październik", u"listopad", u"grudzień"
-]
-# MONTHS = [m[0] for m in months] żeby nie duplikować?
-
-WEEK_DAYS = {
-    0: u"pn", 1: u"wt", 2: u"śr", 3: u"cz", 4: u"pt", 5: u"so", 6: u"n"
-}
+from .solid_data import *
 
 
 class Team(models.Model):
-
     name = models.CharField(max_length=200, unique=True, null=False)
     user = models.ForeignKey(User, null=True)
 
@@ -64,9 +27,9 @@ class Schedule(models.Model):
         return 'Schedule {}'.format(self.name)
 
     def get_month_calendar(self):
-
-        # import pdb; pdb.set_trace()
-
+        """
+        Funkcja zwraca listę zawierającą informację o dniach tygodnia w kolejnych dniach miesiąca.
+        """
         n = MONTHS.index(self.month) + 1
         week_day, day_no = calendar.monthrange(int(self.year), n)
 
@@ -78,8 +41,6 @@ class Schedule(models.Model):
                 week_day = 0
 
         month_calendar = list(zip([elem + 1 for elem in range(day_no)], week_days))
-        # print("month_calendar", month_calendar)
-
         return month_calendar
 
 
@@ -99,17 +60,15 @@ class OneSchedule(models.Model):
     def __str__(self):
         return 'OneSchedule for person {}'.format(self.person)
 
-
     def get_working_days_number_person(self):
         """
         Funkcja zwraca liczbę dyżurów dziennych lub nocnych w ciągu miesiąca grafiku.
         """
         number = 0
         for day in self.one_schedule:
-            if day in u"DN":
+            if day in TYPE_OF_WORK:
                 number += 1
         return number
-
 
     def get_number_of_nights(self):
         """
@@ -117,10 +76,17 @@ class OneSchedule(models.Model):
         """
         number = 0
         for day in self.one_schedule:
-            if day in u"N":
+            if day == NIGHT:
                 number += 1
         return number
 
+    def wheather_day_is_free(self, number):
+        """
+        Metoda zwraca True jeśli osoba może przyjąć dyżur, False jeśli nie może przyjąć dyżuru. OK
+        """
+        if self.one_schedule[number] == FREE_DAY:
+            return True
+        return False
 
     def get_number_of_days(self):
         """
@@ -128,7 +94,7 @@ class OneSchedule(models.Model):
         """
         number = 0
         for day in self.one_schedule:
-            if day in u"D":
+            if day == DAY:
                 number += 1
         return number
 
@@ -145,60 +111,43 @@ class OneSchedule(models.Model):
                 self.one_schedule[day_number + 1:]
             )
 
+    def filtre_work_days_in_month(self, no_of_working_days):
+        """
+        Metoda zwraca Trur jeśli osoba ma mniej dni roboczych w miesiącu niż no_of_working_days, inaczej False.
+        """
+        if self.get_working_days_number_person() <= no_of_working_days:
+            return True
+        return False
 
-###########################################
+    def filtre_double_work(self, day_number, work):
+        """
+        Metoda zwraca False jeśli dodanie dyżuru D spowoduje powstanie dyżuri 24 h ND, inaczej True
+        """
+        if day_number == 0 and work == NIGHT and self.one_schedule[day_number + 1] == DAY:
+                return False
 
-############################################3
+        elif 0 < day_number < len(self.one_schedule)-1:
+            if work == NIGHT and self.one_schedule[day_number + 1] == DAY:
+                return False
 
+            elif work == DAY and self.one_schedule[day_number - 1] == NIGHT:
+                return False
 
+        return True
 
-# def get_teams_from_db():
-#     """ Zwraca listę z obiektami Team. """
-#     return Team.objects.all()
+    def filtre_work_days_in_week(self, no_of_working_days, day_number):
+        """
+        Metoda zwraca True jeśli liczba dni roboczych w one_schedule w tygodniu nie przekracza 4, inaczej False.
+        """
+        if day_number <= 6:
+            schedule_part = self.one_schedule[:day_number]
+        else:
+            schedule_part = self.one_schedule[day_number - 7: day_number]
 
-
-# def get_team_from_db(team_name):
-#     """ Zwraca obiekt Team gdzie name=team_name."""
-#     # po wrzuceniu do widokw moze przyda sie https://docs.djangoproject.com/en/1.9/topics/http/shortcuts/#get-object-or-404
-#     return Team.objects.get(name=team_name)
-
-
-# def get_schedule_from_db(schedule_name):
-#     """Zwraca instancję Schedule na podstawie danych z db, jako arg przyjmuje schedule_name."""
-#     return Schedule.objects.get(name=schedule_name)
-
-
-# def remove_team(team_name):
-#     """ Usywa z bazy danych obiekt Team  gdzie  name=team_name."""
-#     team = Team.objects.get(name=team_name)
-#     team.delete()
-
-
-# def remove_schedule(schedule_name):
-#     """ Usuwa wpis dla podanego schedule z bazy danych. """
-#     schedule = Schedule.objects.get(name=schedule_name)
-#     schedule.delete()
-
-
-# def save_team_to_db(team_name, crew):
-#     """
-#     Zapisuje team do bazy, Jako arg przyjmuje instancję Team.
-#     Jeżeli dany wpis w db już istnieje, usuwa poprzedni wpis i tworzy nowy.
-#     """
-#     a_team = Team(name=team_name)
-#     a_team.save()
-#
-#     person_list = [Person(name=name) for name in crew]
-#     for person in person_list:
-#         person.crew = a_team
-#         person.save()
-
-
-# def get_schedule_names_from_db():
-#     """ Zwraca listę stringów z nazwami schedules. """
-#     return [schedule.name for schedule in Schedule.objects.all()]
-
-
-
-
-
+        number = 0
+        for day in schedule_part:
+            if day in TYPE_OF_WORK:
+                number += 1
+        if number > no_of_working_days:
+            return False
+        return True

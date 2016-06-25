@@ -6,10 +6,12 @@
 
     <p> Wprowadź nazwę dla Grafiku. Domyślnie zawiera on wybrany miesiąc i rok dla tworzenia grafiku, oraz nazwę zespołu.
     <p></p>
-    {% if not current_schedule %}
-    <p><input type="text" name="schedule_name" value="{{selected_year}} {{selected_month}} {{team.name}}" size="50"></p>
-    {% else %}
+    {% if current_schedule %}
     <p><input type="text" name="schedule_name" value="{{current_schedule.name}}" size="50"></p>
+    {% elif current_schedule_name %}
+    <p><input type="text" name="schedule_name" value="{{current_schedule_name}}" size="50"></p>
+    {% else %}
+    <p><input type="text" name="schedule_name" value="{{selected_year}} {{selected_month}} {{team.name}}" size="50"></p>
     {% endif %}
 
     <p>Liczba osób na dyżurze -- w dzień>
@@ -51,10 +53,7 @@
     <input type="submit" name="_save_schedule" value="Zapisz Grafik w bazie danych">
     <input type="submit" name="_export_schedule_as_pdf" value="Zapisz w formacie PDF">
 
-
 {% block table %} {% endblock %}
-
 </form>
-
 {% endblock %}
 

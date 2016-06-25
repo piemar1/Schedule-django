@@ -1,6 +1,7 @@
 
 {% extends "schedule/base.html" %}
 {% block body %}
+
 <script>
 function myCreateFunction() {
     var table = document.getElementById("team_table");
@@ -16,7 +17,6 @@ function myDeleteFunction() {
 }
 </script>
 
-
 <form action="{% url 'schedule:team_update' %}" method="post">
 {% csrf_token %}
 
@@ -27,7 +27,6 @@ Tutaj wpisz nazwę dla zespołu -->
 <input type="submit" name="create_team" value="dodaj osobę">
 <input type="submit" name="create_team" value="odejmij osobę">
 <input type="submit" name="save_team" value="Zapisz załogę">
-
 
 <p></p>
 
@@ -44,5 +43,6 @@ Tutaj wpisz nazwę dla zespołu -->
     {% endfor %}
 </table>
 </form>
+
 {% endblock %}
 

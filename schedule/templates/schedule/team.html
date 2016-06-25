@@ -1,7 +1,6 @@
 {% extends "schedule/base.html" %}
 {% block body %}
 
-
 <form action="{% url 'schedule:team_update' %}" method="post">
 {% csrf_token %}
 
@@ -15,11 +14,10 @@ Tutaj wpisz nazwę dla zespołu -->
 <input type="submit" name="save_team" value="Zapisz załogę">
 <p></p>
 
-
 <table id="team_table" name="team_table" style="width:100%">
     <tr>
-    <td>Liczba</td>
-    <td>Imię Nazwisko</td>
+        <td>Liczba</td>
+        <td>Imię Nazwisko</td>
     </tr>
     {% for person in team.person_set.all %}
     <tr>
@@ -29,6 +27,5 @@ Tutaj wpisz nazwę dla zespołu -->
     {% endfor %}
 </table>
 </form>
-
 
 {% endblock %}

@@ -15,22 +15,23 @@
         <td><b>{{day}}</b></td>
         {% endfor %}
     </tr>
+    <tr>
     {% for person_name, small_schedule in small_schedules %}
-            <td>{{person_name}}</td>
+        <td>{{person_name}}</td>
 
-            {% for day in small_schedule %}
-            <td>
-                <select name="{{person_name}}_day{{forloop.counter}}">
-                    {% for w in work %}
-                        {% if day == w %}
-                            <option value="{{w}}" SELECTED><b>{{w}}</b></option>
-                        {% else %}
-                            <option value="{{w}}">{{w}}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </td>
-            {% endfor %}
+        {% for day in small_schedule %}
+        <td>
+            <select name="{{person_name}}_day{{forloop.counter}}">
+                {% for w in work %}
+                    {% if day == w %}
+                        <option value="{{w}}" SELECTED><b>{{w}}</b></option>
+                    {% else %}
+                        <option value="{{w}}">{{w}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </td>
+        {% endfor %}
     </tr>
     {% endfor %}
 </table>
