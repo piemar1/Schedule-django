@@ -21,4 +21,3 @@ urlpatterns = [
     url(r'^schedule_update/$', views.schedule_update, name='schedule_update'),
 
 ]
-

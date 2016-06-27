@@ -3,6 +3,7 @@
 
 __author__ = 'Marcin Pieczyński'
 
+import os
 
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.units import cm
@@ -15,7 +16,6 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 from .models import *
 
-import os
 
 
 path = os.path.dirname(os.path.realpath(__file__)) + "/static/fonts/"
@@ -47,10 +47,8 @@ class WritePDF:
         self.month_calendar = month_calendar
         self.month_working_days = month_working_days
         self.no_of_workdays = no_of_workdays
-
         self.width, self.height = A4
         self.styles = getSampleStyleSheet()
-
         self.buffer = file_like_handle
         self.story = []
 
@@ -61,22 +59,29 @@ class WritePDF:
         def make_landscape(canvas,doc):
             canvas.setPageSize(landscape(A4))
 
-        # file initialization in buffer !!!!
-        self.doc = BaseDocTemplate(self.buffer,
-                                   showBoundary=1,   # margines
-                                   pagesize=landscape(A4))
+        # file initialization in buffer
+        self.doc = BaseDocTemplate(
+            self.buffer,
+            showBoundary=1,   # margines
+            pagesize=landscape(A4)
+        )
 
         # create the frames. Here you can adjust the margins
-        frame = Frame(self.doc.leftMargin-65,
-                      self.doc.bottomMargin - 50,
-                      self.doc.width + 125,
-                      self.doc.height + 110, id='first_frame')
+        frame = Frame(
+            self.doc.leftMargin-65,
+            self.doc.bottomMargin - 50,
+            self.doc.width + 125,
+            self.doc.height + 110, id='first_frame'
+        )
 
         # add the PageTempaltes to the BaseDocTemplate.
         # You can also modify those to adjust the margin if you need more control over the Frames.
-        self.doc.addPageTemplates(PageTemplate(id='first_page',
-                                               frames=frame,
-                                               onPage=make_landscape))
+        self.doc.addPageTemplates(
+            PageTemplate(
+                id='first_page',
+                frames=frame,
+                onPage=make_landscape)
+        )
         self.create_text()
         self.create_table()
         self.create_footer()
@@ -144,7 +149,6 @@ class WritePDF:
         col_width.extend([0.7 * cm, 0.7 * cm, 0.7 * cm])
 
         table = Table(data, col_width)
-
         table.hAlign = "CENTRE"
 
         # styl tabeli
@@ -174,61 +178,8 @@ class WritePDF:
         self.story.append(p)
 
 
-
     def create_footer(self):
-
         header_text = u"Grafik przygotowany w programie GrafikIwonki, kontakt marcin-pieczynski@wp.pl"
         p = Paragraph(header_text, styles['myStyle'])
         self.story.append(Spacer(1, 0.5*cm))
         self.story.append(p)
-
-
-# if __name__ == "__main__":
-#
-#     schedule_name = "FIRST Schedule"
-#     creation_date = "today"
-#     month = "styczeń"
-#     year = 2016
-#     crew = [u'Aaa', u'Iwona Pieczyńska', u'C', u'D', u'E',
-#             u'F', u'G', u'Hggggggggggggggggggggggggg', u'I', u'J',
-#             u'K', u'L', u'Mmm', u'Nnn', u'O']
-#
-#     schedule = [u'D.........UUUUUU..............N',
-#                 u'.D...........................N.',
-#                 u'..D.........................N..',
-#                 u'...D.................UUUUUUN...',
-#                 u'....D.....................N....',
-#                 u'.....D...................N.....',
-#                 u'......D.................N......',
-#                 u'.......D...............N.......',
-#                 u'........D.............N........',
-#                 u'UUU...UUUUUUU........N.........',
-#                 u'..........D.........N..........',
-#                 u'...........D..UUUUUUUU.........',
-#                 u'............D.....N............',
-#                 u'.............D...N.............',
-#                 u'..............D.N..............']
-#
-#     first_schedule = Schedule(schedule_name, creation_date, month, year, crew, schedule)
-#
-#     from main import get_month_calendar
-#
-#     month_calendar = get_month_calendar(first_schedule.year, first_schedule.month)
-#     # print(month_calendar)
-#
-#
-#
-#     t = WritePDF("test.pdf", first_schedule, month_calendar, 24, 14)
-#     t.run()
-
-
-
-
-
-
-
-
-
-
-
-

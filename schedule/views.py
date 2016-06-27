@@ -69,6 +69,7 @@ def get_no_of_workdays(month_working_days):
     for value in WORKING_DAYS_NUMBER.values():
         if month_working_days in value:
             return value[0]
+    return
 
 
 def main_context():
@@ -98,14 +99,12 @@ def main_context():
 # widok podstawowy
 def main_page(request):
     context = main_context()
-    context["message"] = "Witam w aplikacji GafikIwonki do układania grafików pracy."
     return render(request, 'schedule/base.html', context)
 
 
 # widok nowego zespołu
 def new_team(request):
     context = main_context()
-    context["message"] = "Otworzono okno służące do utworzenia nowego zespołu. Wprowadź dane dla zespołu."
     return render(request, 'schedule/new_team.html', context)
 
 
@@ -197,13 +196,8 @@ def new_schedule(request):
     context["month_calendar"] = month_calendar
     context["selected_month"] = request.session["selected_month"]
     context["selected_year"] = request.session["selected_year"]
-    team = Team.objects.get(name=request.session["team_name"])
-    context['team'] = team
     context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
-    context["message"] = "Czas przystąpić do układania grafiku dla załogi '{}' " \
-                         "dla miesiąca {} {}.".format(team.name,
-                                                      request.session["selected_month"],
-                                                      request.session["selected_year"])
+    context['team'] = Team.objects.get(name=request.session["team_name"])
     return render(request, 'schedule/new_schedule.html', context)
 
 
@@ -226,9 +220,6 @@ def existed_schedule(request, pk):
     context["current_schedule"] = current_schedule
     context["small_schedules"] = small_schedules
     context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
-    context["message"] = "Edycja grafiku pracy '{}' stworzonego dla miesiąca {} {}.".format(current_schedule.name,
-                                                                                            current_schedule.month,
-                                                                                            current_schedule.year)
     return render(request, 'schedule/schedule.html', context)
 
 
@@ -244,7 +235,6 @@ class TeamDetailView(generic.DetailView):
 
         # Dodaje pozostałą zawartość do context
         context.update(main_context())
-        context["message"] = "Otworzono okno służące do edycji załogi {}".format("{{team.name}}")
         return context
 
 
@@ -363,8 +353,6 @@ def schedule_update(request):
 
             except KeyError:
                 context = main_context()
-                schedule_name = request.POST['schedule_name']
-                month_calendar = request.session["month_calendar"]
                 context["current_schedule_name"] = schedule_name
                 context["month_calendar"] = month_calendar
                 context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
@@ -406,8 +394,8 @@ def schedule_update(request):
         if "_fill_schedule" in request.POST:
 
             context = main_context()
-            schedule_name = request.POST['schedule_name']
-            month_calendar = request.session["month_calendar"]
+            # schedule_name = request.POST['schedule_name']
+            # month_calendar = request.session["month_calendar"]
             context["current_schedule_name"] = schedule_name
             context["month_calendar"] = month_calendar
             context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
@@ -425,15 +413,11 @@ def schedule_update(request):
             number_of_tries = 10
             while number_of_tries:
                 try:
-                    new_one_schedules = fill_the_schedule(one_schedules,
-                                                          no_of_workdays,
-                                                          person_per_day,
-                                                          person_per_night)
+                    new_one_schedules = fill_the_schedule(one_schedules, no_of_workdays,
+                                                          person_per_day, person_per_night)
 
-                    small_schedules = [[one_schedule.person.name, one_schedule.one_schedule]
-                                       for one_schedule in new_one_schedules]
-
-                    context["small_schedules"] = small_schedules
+                    context["small_schedules"] = [[one_schedule.person.name, one_schedule.one_schedule]
+                                                  for one_schedule in new_one_schedules]
                     return render(request, 'schedule/schedule.html', context)
 
                 except IndexError:

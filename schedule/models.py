@@ -132,7 +132,6 @@ class OneSchedule(models.Model):
 
             elif work == DAY and self.one_schedule[day_number - 1] == NIGHT:
                 return False
-
         return True
 
     def filtre_work_days_in_week(self, no_of_working_days, day_number):
