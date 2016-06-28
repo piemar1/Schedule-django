@@ -10,6 +10,7 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 
 from .models import Team, Schedule, Person, OneSchedule
 from .solid_data import *
@@ -120,32 +121,17 @@ def grafik_update(request):
 
         # Otwieranie okna służącego do edycji istniejącej załogi
         elif "_edit_team" in request.POST:
-            try:
-                team_to_edit = Team.objects.get(name=request.POST["edit_team"])
-                return HttpResponseRedirect(reverse('schedule:team', args=(team_to_edit.pk,)))
-
-            except (KeyError, Team.DoesNotExist):
-                context["error_message"] = "Wystąpił błąd podczas pobierania drużyny z bazy danych. " \
-                                           "Najprawdopodobniej drużyna na podanej nazwie nie istnieje w bazie danych."
-                return render(request, 'schedule/base.html', context)
+            team_to_edit = get_object_or_404(Team, name=request.POST["edit_team"])
+            return HttpResponseRedirect(reverse('schedule:team', args=(team_to_edit.pk,)))
 
         # usuwanie istniejącej załogi z bazy danych
         elif "_remove_team" in request.POST:
-            try:
-                team = Team.objects.get(name=request.POST["edit_team"])
-                team.delete()
-
-            except (KeyError, Team.DoesNotExist):
-                context = main_context()
-                context["error_message"] = "Wystąpił błąd podczas usuwania drużyny. " \
-                                           "Najprawdopodobniej drużyna została już wcześniej " \
-                                           "usunięta albo nie zapisana."
-                return render(request, 'schedule/base.html', context)
+            team_to_remove = get_object_or_404(Team, name=request.POST["edit_team"])
+            team_to_remove.delete()
             return HttpResponseRedirect('/schedule/')
 
         # Otwieranie okna do wprowadzenia nowego grafiku
         elif "_new_schedule" in request.POST:
-
             try:
                 selected_month = request.POST['month']
                 selected_year = int(request.POST['year'])
@@ -166,26 +152,14 @@ def grafik_update(request):
 
         # usunięcie istniejącego grafiku z bazy danych
         elif "_remove_schedule" in request.POST:
-            try:
-                schedule = Schedule.objects.get(name=request.POST["schedule_to_edit"])
-                schedule.delete()
-                return HttpResponseRedirect('/schedule/')
-
-            except (KeyError, Schedule.DoesNotExist):
-                context = main_context()
-                context["error_message"] = "Wystąpił błąd podczas usuwania grafiku. " \
-                                           "Najprawdopodobniej grafik został już wcześniej " \
-                                           "usunięty albo nie zapisany."
-                return render(request, 'schedule/base.html', context)
+            schedule = get_object_or_404(Schedule, name=request.POST["schedule_to_edit"])
+            schedule.delete()
+            return HttpResponseRedirect('/schedule/')
 
         # edycja istniejącego grafiku z bazy danych
         elif "_edit_schedule" in request.POST:
-            try:
-                schedule_to_edit = Schedule.objects.get(name=request.POST["schedule_to_edit"])
-                return HttpResponseRedirect('/schedule/' + str(schedule_to_edit.pk) + '/schedule/')
-
-            except (KeyError, Schedule.DoesNotExist):
-                return render(request, 'schedule/base.html', context)
+            schedule_to_edit = get_object_or_404(Schedule, name=request.POST["schedule_to_edit"])
+            return HttpResponseRedirect('/schedule/' + str(schedule_to_edit.pk) + '/schedule/')
 
 
 # widok nowego grafiku
@@ -248,7 +222,6 @@ def team_update(request):
             context = main_context()
             try:
                 team_name = request.POST["team_name"].strip()
-
                 # czytanie obecnej drużyny z widoku
                 person_list = [key for key in request.POST.keys() if "person" in key]
                 crew = [request.POST[person].strip() for person in person_list if request.POST[person].strip()]
@@ -257,6 +230,7 @@ def team_update(request):
                 # wyświetlenie strony do wprowadzenia zespołu od nowa
                 return render(request, 'schedule/new_team.html', context)
 
+            # W przyszłości planuję napisać ten fragment w JavaScript
             if not team_name and not crew:
                 context["error_message"] = "Wprowadź nazwę dla zespołu oraz imiona i nazwiska osób w zespole."
                 return render(request, "schedule/new_team.html", context)
@@ -303,13 +277,12 @@ def team_update(request):
 def schedule_update(request):
 
     if request.POST:
-
         selected_month = request.session["selected_month"]
         selected_year = request.session["selected_year"]
         month_calendar = request.session["month_calendar"]
 
         schedule_name = request.POST['schedule_name']
-        team_for_new_schedule = Team.objects.get(name=request.session["team_name"])
+        team_for_new_schedule = get_object_or_404(Team, name=request.session["team_name"])
 
         crew = team_for_new_schedule.person_set.all()
 
