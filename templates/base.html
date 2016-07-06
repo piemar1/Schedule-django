@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+    <html lang="{% block page_language %}pl{% endblock %}">
+    <head>
+        {% block static_files %}
+        {% endblock %}
+        <meta charset="utf-8" />
+        <title>{% block page_title %}Grafik{% endblock %}</title>
+    </head>
+    <body>
+
+        <div id="header">
+			<h1>GrafikIwonki</h1>
+		</div>
+
+        {% block layout %}
+
+        {% endblock %}
+		
+		<div id="footer">
+		Opracował Marcin Pieczyński, kontakt marcin-pieczynski@wp.pl
+		</div>
+    </body>
+</html>
