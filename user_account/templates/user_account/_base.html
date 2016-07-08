@@ -1,18 +1,33 @@
 {% extends "base.html" %}
 
 
+
+
+
 {% block static_files %}
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static 'user_account/style.css' %}">
 {% endblock %}
 
-{% block layout %}
-  {% if user.is_authenticated %}
-  Welcome <code>{{ user.name }}</code>! Click to  <a href="{% url 'user_account:logout' %}">Logout</a>
-  {% else %}
-  Please log in <a href="{% url 'user_account:login' %}">here</a> or <a href="{% url 'user_account:register' %}">Register</a>
-  {% endif %}
 
-  {% block contents %}
-  {% endblock %}
+      {% if user.is_authenticated %}
+          Welcome <code>{{ user.name }}</code>! Click to  <a href="{% url 'accounts:logout' %}">Logout</a>
+      {% else %}
+          Please log in <a href="{% url 'accounts:login' %}">here</a> or <a href="{% url 'accounts:register' %}">Register</a>
+      {% endif %}
+
+
+_BASE
+    {% if user.is_authenticated %}
+        <p>Witam {{ user.name }} </p>
+        <p><a href="{% url 'user_account:logout' %}">Wyloguj</a></p>
+    {% else %}
+        <a href="{% url 'user_account:login' %}">Logowanie</a>
+        <br>
+        <a href="{% url 'user_account:register' %}">Rejestracja</a>
+    {% endif %}
+_BASE
+
+
+{% block layout %}
 {% endblock %}

@@ -1,7 +1,9 @@
 {% extends "user_account/_base.html" %}
 
-{% block contents %}
+{% block layout %}
 
     <h1>Congratulation You Created a User profile!</h1>
+
+<p><a href="{% url 'user_account:register' %}">Powrót do strony logowania</a></p>
 
 {% endblock %}

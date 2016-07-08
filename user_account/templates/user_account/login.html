@@ -1,6 +1,6 @@
 {% extends "user_account/_base.html" %}
 
-{% block contents %}
+{% block layout %}
     {% if user.is_authenticated %}
         <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
     {% else %}

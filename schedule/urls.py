@@ -7,7 +7,7 @@ from . import views
 
 
 urlpatterns = [
-    # ex: /polls/
+
     url(r'^$', views.main_page, name='main_page'),
 
     url(r'^grafik_update/$', views.grafik_update, name='grafik_update'),
