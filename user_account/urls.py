@@ -8,9 +8,11 @@ urlpatterns = [
     url(r'^$', views.NewUserView.as_view(), name='register'),
     url(r'^success/$', TemplateView.as_view(template_name="user_account/success.html"), name='success_created'),
     url(r'^activate/(?P<activation_key>\w+)/$', views.activate),
+    url(r'^logout/$', views.logout_view, name='logout'),
+
+
 
     # url(r'^login/$', views.LogInView.as_view(), name='login'),
-    url(r'^logout/$', views.logout_view, name='logout'),
 
 ]
 

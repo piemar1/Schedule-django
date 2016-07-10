@@ -5,31 +5,32 @@
 
     {% if user.is_authenticated %}
         <div id="user_is_authenticated">
-        <p>Witam <code>{{ user.name }}</code>!</p>
+        <p>Witam CCC <code>{{ user.name }}</code>!</p>
         <p><a href="{% url 'user_account:logout' %}">Wyloguj</a></p>
         </div>
 
     {% else %}
-
+        <div id="new_user">
         <form class='new_user' action="" method="post">
             {% csrf_token %}
-            <div id="new_user">
             <p>Rejestracja nowego użytkownika</p>
             {{ forms.new_user.as_p }}
             <button name='action' value='new_user' type="submit">Rejestruj</button>
-            </div>
         </form>
+        </div>
+
+        <div id="login">
 
         <form class='login' action="" method="post">
             {% csrf_token %}
 
-            <div id="login">
             <p>Logowanie</p>
             <p>{{ forms.login.as_p }}</p>
             <button name='action' value='login' type="submit">Zaloguj</button>
-            </div>
         </form>
-  {% endif %}
+        </div>
+
+    {% endif %}
 
 {% endblock %}
 

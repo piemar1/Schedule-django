@@ -1,10 +1,28 @@
 
 import datetime
+
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.utils import timezone
 
+
+# class UserManager(BaseUserManager):
+#     """ Menager twozenia użytkowników."""
+#     def _create_user(self, email, password, active, **extra_fields):
+#         now = timezone.now()
+#         email = self.normalize_email(email)
+#
+#         user = self.model(email=email, active=active,
+#                           register_date=now, **extra_fields)
+#         user.set_password(password)
+#         user.save()
+#         return user
+#
+#     def create_user(self, email=None, password=None, **extra_fields):
+#         return self._create_user(email, password, False, **extra_fields)
+
 class User(AbstractBaseUser):
+    """ Menager użytkownika."""
 
     name = models.CharField(max_length=50)
     surname = models.CharField(max_length=50)

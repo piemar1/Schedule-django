@@ -1,17 +1,22 @@
 import random, hashlib
 
-from django.views import generic
-from django.core.mail import send_mail
-
-from django.shortcuts import get_object_or_404, render_to_response, HttpResponseRedirect, redirect
 from yourworkschedule.settings import EMAIL_HOST_USER, HOST_NAME
+from django.shortcuts import get_object_or_404, render_to_response, HttpResponseRedirect, redirect
+from django.core.mail import send_mail
 from django.core.urlresolvers import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
+from django.views import generic
 
 from .forms import NewUserForm, LogInForm
 from .models import User
 from .multiform import MultiFormsView
+
+
+# import pdb;pdb.set_trace()
+
+
+
 
 
 class NewUserView(MultiFormsView):
@@ -21,6 +26,8 @@ class NewUserView(MultiFormsView):
                     'login': LogInForm}
 
     def new_user_form_valid(self, form):
+
+        print("form.cleaned_data", form.cleaned_data)
         new_user = form.save()
         new_user.set_password(form.cleaned_data["password"])
 
@@ -34,14 +41,14 @@ class NewUserView(MultiFormsView):
         new_user.activation_key = h.hexdigest()
 
         new_user.save()
+
         subject = "Your Work Schedule: Confirm registration"
         text = "Hi %s, \n please confirm Your registration by clicking or copy-past this link \n" \
                "%s/user_account/activate/%s/ \n Please confirm with in 48 houers. Thank You for using our app."\
-                "\n Your Sandbox Team" % (new_user.name, HOST_NAME, new_user.activation_key)
+               "\n Your Sandbox Team" % (new_user.name, HOST_NAME, new_user.activation_key)
         send_mail(subject, text, EMAIL_HOST_USER, [new_user.email], fail_silently=False)
         print("WYSŁANO MAIL !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return HttpResponseRedirect(self.get_success_url())
-
 
     def login_form_valid(self, form):
         # if request.method == "POST":
@@ -78,4 +85,4 @@ def activate(request, activation_key):
 
 def logout_view(request):
     logout(request)
-    return redirect('user_account/new_account.html', {'success': True})
+    return HttpResponseRedirect('/user_account/', {'success': True})
