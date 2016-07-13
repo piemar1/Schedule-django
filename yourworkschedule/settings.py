@@ -34,11 +34,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 
-
-# EMAIL_HOST_PASSWORD = "pyladies1234"
-# EMAIL_HOST_USER = "piaskownica.app@gmail.com"
-# DEFAULT_FROM_EMAIL = "piaskownica.app@gmail.com"
-
 EMAIL_HOST_USER = 'marcinpieczynski1@gmail.com'
 DEFAULT_FROM_EMAIL = 'marcinpieczynski1@gmail.com'
 EMAIL_HOST_PASSWORD = 'lednica2000'
@@ -55,7 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user_account',
-    'schedule',
+    # 'schedule',
 
 ]
 
@@ -107,7 +102,13 @@ TEMPLATES = [
 # )
 #####################
 
+AUTHENTICATION_BACKENDS = (
+    # 'userena.backends.UserenaAuthenticationBackend',
+    # 'guardian.backends.ObjectPermissionBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
+AUTH_USER_MODEL = 'user_account.User'
 
 WSGI_APPLICATION = 'yourworkschedule.wsgi.application'
 

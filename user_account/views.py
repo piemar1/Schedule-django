@@ -1,6 +1,5 @@
 import random, hashlib
 
-from yourworkschedule.settings import EMAIL_HOST_USER, HOST_NAME
 from django.shortcuts import get_object_or_404, render_to_response, HttpResponseRedirect, redirect
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse_lazy
@@ -11,12 +10,16 @@ from django.views import generic
 from .forms import NewUserForm, LogInForm
 from .models import User
 from .multiform import MultiFormsView
+from yourworkschedule.settings import EMAIL_HOST_USER, HOST_NAME
 
 
 # import pdb;pdb.set_trace()
 
 
-
+# Działa dodawanie, wysłanie maila  i aktywowanie konta user
+#
+# Wprowadziłem zmiany w modelu user ale bez migracji
+# nie działa logowanie i autenticate
 
 
 class NewUserView(MultiFormsView):
@@ -27,7 +30,7 @@ class NewUserView(MultiFormsView):
 
     def new_user_form_valid(self, form):
 
-        print("form.cleaned_data", form.cleaned_data)
+        # print("form.cleaned_data", form.cleaned_data)
         new_user = form.save()
         new_user.set_password(form.cleaned_data["password"])
 
@@ -38,8 +41,8 @@ class NewUserView(MultiFormsView):
         h = hashlib.sha1()
         text = salt+new_user.name
         h.update(text.encode('utf-8'))
-        new_user.activation_key = h.hexdigest()
 
+        new_user.activation_key = h.hexdigest()
         new_user.save()
 
         subject = "Your Work Schedule: Confirm registration"
@@ -55,10 +58,13 @@ class NewUserView(MultiFormsView):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             user = authenticate(email=email, password=password)
-            # import pdb;pdb.set_trace()
+            print("email", email, "password", password)
+            profile = get_object_or_404(User, email=email)
+            print(profile.name, profile.name, profile.password)
+
             if user.active:
                 login(self.request, user)
-            return redirect('user_account/home.html', {'success': True})
+            return HttpResponseRedirect('/user_account/home/', {'success': True})
 
 
 def activate(request, activation_key):
@@ -70,17 +76,10 @@ def activate(request, activation_key):
                                                              'name': profile.name + " " + profile.surname})
 
 
-# class LogInView(generic.FormView):
-#     template_name = "user_account/login.html"
-#     form_class = LogInForm
-#
-#     def form_valid(self, form):
-#         email = form.cleaned_data['email']
-#         password = form.cleaned_data['password']
-#         user = authenticate(email=email, password=password)
-#         if user.active:
-#             login(self.request, user)
-#         return redirect('user_account/home.html', {'success': True})
+class HomeView(generic.ListView):
+    template_name = 'user_account/home.html'
+    context_object_name = 'User_list'
+    model = User
 
 
 def logout_view(request):

@@ -8,7 +8,7 @@ class UserAdmin(admin.ModelAdmin):
         ('User Mail', {'fields':['email']}),
         ('Is User Active', {'fields':['active']})
     ]
-    list_display = ('name', 'surname', 'email', 'active')   # dodaje koluny tabeli
+    list_display = ('name', 'surname', 'email', 'active', 'superuser', 'staff')   # dodaje koluny tabeli
     list_filter = ['active']
 
 

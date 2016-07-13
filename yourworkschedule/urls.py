@@ -22,9 +22,9 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
     # ex: /schedule/
-    url(r'^schedule/', include('schedule.urls', namespace="schedule")),
+    # url(r'^schedule/', include('schedule.urls', namespace="schedule")),
 
     # ex: /schedule/
-    url(r'^user_account/', include('user_account.urls', namespace="user_account")),
+    url(r'^user_account/', include('user_account.urls', namespace='user_account')),
 
 ]

@@ -3,7 +3,9 @@
 __author__ = 'Marcin Pieczyński'
 
 import calendar
+
 from django.db import models
+
 from user_account.models import User
 from .solid_data import *
 
