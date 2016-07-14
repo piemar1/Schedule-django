@@ -1,11 +1,11 @@
 {% extends "user_account/_base.html" %}
 
 
-{% block layout %}
+{% block base_layout %}
 
     {% if user.is_authenticated %}
         <div id="user_is_authenticated">
-        <p>Witam CCC <code>{{ user.name }}</code>!</p>
+        <p>Udane Logowanie ;-) Witam <code>{{ user.name }}</code>!</p>
         <p><a href="{% url 'user_account:logout' %}">Wyloguj</a></p>
         </div>
 
@@ -29,8 +29,12 @@
             <button name='action' value='login' type="submit">Zaloguj</button>
         </form>
         </div>
-
     {% endif %}
 
+    {% block layout %}
+    {% endblock %}
+
+
 {% endblock %}
+
 

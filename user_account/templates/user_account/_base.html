@@ -2,14 +2,13 @@
 
 
 
-
-
 {% block static_files %}
-    {% load staticfiles %}
-    <link rel="stylesheet" type="text/css" href="{% static 'user_account/style.css' %}">
+
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'user_account/style.css' %}">
+
 {% endblock %}
 
 
-
-{% block layout %}
+{% block base_layout %}
 {% endblock %}

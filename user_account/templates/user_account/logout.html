@@ -1,5 +1,10 @@
-{% extends "user_account/_base.html" %}
+{% extends "user_account/log_or_new_account.html" %}
 
-{% block layout %}
-<p>Logged out</p>
+
+{% block base_layout %}
+
+<p>Nastąpiło poprawne wylogowanie.</p>
+<br>
+<p><a href="{% url 'user_account:register' %}">Powrót do strony logowania</a></p>
+
 {% endblock %}

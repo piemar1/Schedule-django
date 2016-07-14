@@ -84,4 +84,5 @@ class HomeView(generic.ListView):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect('/user_account/', {'success': True})
+    return render_to_response('user_account/logout.html')
+    # return HttpResponseRedirect('/user_account/logout/', {'success': True})
