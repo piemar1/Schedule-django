@@ -10,9 +10,7 @@ urlpatterns = [
     url(r'^activate/(?P<activation_key>\w+)/$', views.activate),
     url(r'^logout/$', views.logout_view, name='logout'),
     url(r'^home/$', views.HomeView.as_view(), name='home'),
-
-
-    # url(r'^login/$', views.LogInView.as_view(), name='login'),
+    url(r'^user_edit/$', views.edit_user_view, name='user_edit')
 
 ]
 

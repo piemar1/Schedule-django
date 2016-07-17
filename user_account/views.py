@@ -1,13 +1,14 @@
 import random, hashlib
 
-from django.shortcuts import get_object_or_404, render_to_response, HttpResponseRedirect, redirect
+from django.shortcuts import get_object_or_404, render_to_response, HttpResponseRedirect, redirect, render
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.views import generic
+from django.contrib.auth.decorators import login_required
 
-from .forms import NewUserForm, LogInForm
+from .forms import NewUserForm, LogInForm, EditUserForm
 from .models import User
 from .multiform import MultiFormsView
 from yourworkschedule.settings import EMAIL_HOST_USER, HOST_NAME
@@ -27,6 +28,14 @@ class NewUserView(MultiFormsView):
     success_url = reverse_lazy('user_account:success_created')
     form_classes = {'new_user': NewUserForm,
                     'login': LogInForm}
+
+    def get_context_data(self, **kwargs):
+
+        # implementuje get_context_date z Clasy generic.DetailView
+        context = super(NewUserView, self).get_context_data(**kwargs)
+        if 'user_is_active' in self.request.session:
+            context['user_is_active'] = self.request.session['user_is_active']
+        return context
 
     def new_user_form_valid(self, form):
 
@@ -58,11 +67,16 @@ class NewUserView(MultiFormsView):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             user = authenticate(email=email, password=password)
-            print("email", email, "password", password)
             profile = get_object_or_404(User, email=email)
-            print(profile.name, profile.name, profile.password)
 
-            if user.active:
+            # przygotować widok 404 gdy nie podano nieprawidłowy login i lub hasło
+
+            if not user.active:
+                self.request.session['user_is_active'] = False
+                print("NON ACTIVE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                return HttpResponseRedirect('/user_account/')
+            else:
+                self.request.session['user_is_active'] = True
                 login(self.request, user)
             return HttpResponseRedirect('/user_account/home/', {'success': True})
 
@@ -85,4 +99,35 @@ class HomeView(generic.ListView):
 def logout_view(request):
     logout(request)
     return render_to_response('user_account/logout.html')
-    # return HttpResponseRedirect('/user_account/logout/', {'success': True})
+
+
+@login_required()
+def edit_user_view(request):
+    template_name = "user_account/user_edit.html"
+    form = EditUserForm(request.POST or None, instance=request.user)
+    if form.is_valid():
+        form.save()
+        return redirect('user_account:user_edit')
+    return render(request, template_name, {'form': form})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
