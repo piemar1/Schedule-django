@@ -1,4 +1,4 @@
-{% extends "schedule/base.html" %}
+{% extends "schedule/_base.html" %}
 {% block body %}
 
 <form action="{% url 'schedule:team_update' %}" method="post">
@@ -13,6 +13,11 @@ Tutaj wpisz nazwę dla zespołu -->
 <input type="submit" name="create_team" value="odejmij osobę">
 <input type="submit" name="save_team" value="Zapisz załogę">
 <p></p>
+
+
+<p>team{{team.name}}</p>
+<p>user{{request.user.name}}</p>
+
 
 <table id="team_table" name="team_table" style="width:100%">
     <tr>

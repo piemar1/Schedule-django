@@ -6,6 +6,7 @@
     {% if user.is_authenticated %}
         <div id="user_is_authenticated">
         <p>Udane Logowanie ;-) Witam <code>{{ user.name }}</code>!</p>
+        <p><a href="{% url 'user_account:user_edit' %}">Edycja konta</a></p>
         <p><a href="{% url 'user_account:logout' %}">Wyloguj</a></p>
         </div>
 
@@ -31,9 +32,11 @@
         </div>
     {% endif %}
 
-    {% if user_is_active == False%}
+    {% if user_is_active == False %}
         <p>Uwaga, użytkownik jest nieaktywny, prosze aktywować swoje konto poprzez wykorzystanie linku aktywacyjnego
         <p>wysłanego na adres mailowy. A aktywacji możliwe będzie zalogowanie.
+    {% elif user_is_none == True %}
+        <p>Uwaga, wprowadzony email oraz hasło nie pasują do siebie, albo nie istnieją.
     {% endif %}
 
     {% block layout %}

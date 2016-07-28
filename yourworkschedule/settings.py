@@ -32,7 +32,6 @@ HOST_NAME = "http://127.0.0.1:8000"
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user_account',
-    # 'schedule',
+    'schedule',
 ]
 
 
@@ -77,26 +76,9 @@ TEMPLATES = [
 ]
 
 
-#####################
-#
-# TEMPLATE_DIRS = (
-#     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-#     # Always use forward slashes, even on Windows.
-#     # Don't forget to use absolute paths, not relative paths.
-#     os.path.join(PROJECT_ROOT, 'templates').replace('\\','/'),
-# )
-#
-# # List of callables that know how to import templates from various sources.
-# TEMPLATE_LOADERS = (
-#     'django.template.loaders.filesystem.Loader',
-#     'django.template.loaders.app_directories.Loader',
-# #     'django.template.loaders.eggs.Loader',
-# )
-#####################
 
+# wpis potrzebny w celu prawidłowego logowania urzytkownika
 AUTHENTICATION_BACKENDS = (
-    # 'userena.backends.UserenaAuthenticationBackend',
-    # 'guardian.backends.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -104,6 +86,7 @@ AUTH_USER_MODEL = 'user_account.User'
 
 WSGI_APPLICATION = 'yourworkschedule.wsgi.application'
 
+LOGIN_URL = '/user_account/'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases

@@ -11,7 +11,10 @@ from django.core.urlresolvers import reverse
 from django.views import generic
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
+from user_account.models import User    # needed ???
 from .models import Team, Schedule, Person, OneSchedule
 from .solid_data import *
 
@@ -73,7 +76,7 @@ def get_no_of_workdays(month_working_days):
     return
 
 
-def main_context():
+def main_context(request):
     """
     Funkcja zwraca podstawową zawartość context.
     """
@@ -82,8 +85,8 @@ def main_context():
         'years': YEARS,
         'current_month': current_month(),
         'current_year': current_year(),
-        'teams': Team.objects.all(),
-        'schedules': Schedule.objects.all(),
+        'teams': Team.objects.filter(user=request.user),
+        'schedules': Schedule.objects.filter(user=request.user),
         'default_team_name': today(),
         'default_schedule_name': today(),
         'dafault_team_size': DEFAULT_TEAM,
@@ -98,22 +101,39 @@ def main_context():
 
 
 # widok podstawowy
+@login_required()
 def main_page(request):
-    context = main_context()
-    return render(request, 'schedule/base.html', context)
+    context = main_context(request)
+    return render(request, 'schedule/_base.html', context)
 
 
 # widok nowego zespołu
+@login_required()
 def new_team(request):
-    context = main_context()
+    context = main_context(request)
     return render(request, 'schedule/new_team.html', context)
+
+
+# widok istniejących zespołów
+class TeamDetailView(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'schedule/team.html'
+
+    def get_context_data(self, **kwargs):
+        # implementuje get_context_date z Clasy generic.DetailView
+        context = super(TeamDetailView, self).get_context_data(**kwargs)
+        # Dodaje pozostałą zawartość do context
+        context.update(main_context(self.request))
+
+        team_to_edit = get_object_or_404(Team, name=self.request.session["team_name_to_edit"])
+        context['team'] = team_to_edit
+        return context
 
 
 # działanie przycisków w głównym oknie programu
 def grafik_update(request):
 
     if request.POST:
-        context = main_context()
+        context = main_context(request)
 
         # Otwieranie okna służącego do wprowadzenia nowej załogi
         if "_new_team" in request.POST:
@@ -122,6 +142,7 @@ def grafik_update(request):
         # Otwieranie okna służącego do edycji istniejącej załogi
         elif "_edit_team" in request.POST:
             team_to_edit = get_object_or_404(Team, name=request.POST["edit_team"])
+            request.session["team_name_to_edit"] = team_to_edit.name
             return HttpResponseRedirect(reverse('schedule:team', args=(team_to_edit.pk,)))
 
         # usuwanie istniejącej załogi z bazy danych
@@ -163,9 +184,10 @@ def grafik_update(request):
 
 
 # widok nowego grafiku
+@login_required()
 def new_schedule(request):
 
-    context = main_context()
+    context = main_context(request)
     month_calendar = request.session["month_calendar"]
     context["month_calendar"] = month_calendar
     context["selected_month"] = request.session["selected_month"]
@@ -176,6 +198,7 @@ def new_schedule(request):
 
 
 # widok istniejącego grafiku
+@login_required()
 def existed_schedule(request, pk):
 
     current_schedule = Schedule.objects.get(pk=pk)
@@ -189,27 +212,12 @@ def existed_schedule(request, pk):
     request.session["selected_year"] = current_schedule.year
     request.session["month_calendar"] = month_calendar
 
-    context = main_context()
+    context = main_context(request)
     context["month_calendar"] = month_calendar
     context["current_schedule"] = current_schedule
     context["small_schedules"] = small_schedules
     context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
     return render(request, 'schedule/schedule.html', context)
-
-
-# widok istniejących zespołów
-class TeamDetailView(generic.DetailView):
-    model = Team
-    template_name = 'schedule/team.html'
-
-    def get_context_data(self, **kwargs):
-
-        # implementuje get_context_date z Clasy generic.DetailView
-        context = super(TeamDetailView, self).get_context_data(**kwargs)
-
-        # Dodaje pozostałą zawartość do context
-        context.update(main_context())
-        return context
 
 
 # obsługa przycisków w oknie z edycją drużyn
@@ -219,7 +227,7 @@ def team_update(request):
 
         # zapisywanie drużyny do bazy danych
         if "save_team" in request.POST:
-            context = main_context()
+            context = main_context(request)
             try:
                 team_name = request.POST["team_name"].strip()
                 # czytanie obecnej drużyny z widoku
@@ -252,7 +260,7 @@ def team_update(request):
                     team.delete()
 
                 # zapisanie team do bazy danych
-                a_team = Team(name=team_name)
+                a_team = Team(name=team_name, user=request.user)
                 a_team.save()
 
                 # zapisanie osób przyporządkowanych do team w bazie danych
@@ -270,6 +278,8 @@ def team_update(request):
                 return render(request, "schedule/new_team.html", context)
 
             team = Team.objects.get(name=team_name)
+            request.session["team_name_to_edit"] = team.name
+
             return HttpResponseRedirect(reverse('schedule:team', args=(team.pk,)))
 
 
@@ -309,7 +319,8 @@ def schedule_update(request):
                     name=schedule_name,
                     year=selected_year,
                     month=selected_month,
-                    crew=team_for_new_schedule
+                    crew=team_for_new_schedule,
+                    user=request.user
                 )
                 # zapisuwanie grafiku do bazy danych
                 current_schedule.save()
@@ -325,7 +336,7 @@ def schedule_update(request):
                 return HttpResponseRedirect('/schedule/' + str(current_schedule.pk) + '/schedule/')
 
             except KeyError:
-                context = main_context()
+                context = main_context(request)
                 context["current_schedule_name"] = schedule_name
                 context["month_calendar"] = month_calendar
                 context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
@@ -366,7 +377,7 @@ def schedule_update(request):
         # automatyczne wypełnianie grafiku wedlug zadanych parametrów
         if "_fill_schedule" in request.POST:
 
-            context = main_context()
+            context = main_context(request)
             # schedule_name = request.POST['schedule_name']
             # month_calendar = request.session["month_calendar"]
             context["current_schedule_name"] = schedule_name

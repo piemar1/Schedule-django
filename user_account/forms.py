@@ -19,7 +19,7 @@ class LogInForm(forms.Form):
 class EditUserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['email', 'name', 'surname', 'password']
+        fields = ['email', 'name', 'surname']
 
     new_password_1 = forms.CharField(max_length=30, min_length=8)
     new_password_2 = forms.CharField(max_length=30, min_length=8)
