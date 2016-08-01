@@ -6,13 +6,6 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.utils import timezone
 
 
-
-"""
-Muszę dodac is staff oraz is active !!!!!!!!!!!!!! ponieważ nadpisany przezemnie menager userów musi umożliwiać tworzenie
-superuserów a on musi być is staff
-"""
-
-
 class UserManager(BaseUserManager):
     def _create_user(self, email, password, active, staff, superuser,
                        **extra_fields):

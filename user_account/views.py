@@ -1,12 +1,15 @@
 import random, hashlib
 
-from django.shortcuts import get_object_or_404, render_to_response, HttpResponseRedirect, redirect, render, HttpResponse
+from django.shortcuts import (
+    get_object_or_404, render_to_response, HttpResponseRedirect,
+    redirect, render, HttpResponse)
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout
-from django.views import generic
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+
+from django.views import generic
 
 from .forms import NewUserForm, LogInForm, EditUserForm
 from .models import User
@@ -61,7 +64,6 @@ class NewUserView(MultiFormsView):
                "%s/user_account/activate/%s/ \n Please confirm with in 48 houers. Thank You for using our app."\
                "\n Your Sandbox Team" % (new_user.name, HOST_NAME, new_user.activation_key)
         send_mail(subject, text, EMAIL_HOST_USER, [new_user.email], fail_silently=False)
-        # print("WYSŁANO MAIL !!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return HttpResponseRedirect(self.get_success_url())
 
     def login_form_valid(self, form):
@@ -75,7 +77,7 @@ class NewUserView(MultiFormsView):
         profile = get_object_or_404(User, email=email)
         # przygotować widok 404 gdy nie podano nieprawidłowy login i lub hasło
 
-        if user is None:
+        if user is None or profile is None:
             self.request.session['user_is_none'] = True
             return HttpResponseRedirect('/user_account/')
 
@@ -86,7 +88,7 @@ class NewUserView(MultiFormsView):
             self.request.session['user_is_active'] = True
             self.request.session['user_is_none'] = False
             login(self.request, user)
-        return HttpResponseRedirect('/user_account/home/')
+        return HttpResponseRedirect('/schedule/')
 
 
 def activate(request, activation_key):
@@ -98,17 +100,8 @@ def activate(request, activation_key):
                                                  'name': profile.name + " " + profile.surname})
 
 @login_required()
-def HomeView(request):
+def HomeView(request):                          # do usunięcia, redirect przenieść do NewUserView
     return HttpResponseRedirect('/schedule/')
-
-    # redirect('/schedule/')
-
-
-
-# class HomeView(generic.ListView):
-#     template_name = 'user_account/home.html'
-#     context_object_name = 'User_list'
-#     model = User
 
 
 def logout_view(request):
@@ -116,36 +109,32 @@ def logout_view(request):
     return render_to_response('user_account/logout.html')
 
 
-
-# DO ZROBIENIA, NIE DZIAŁA PRAWIDŁOWO !!!!!!!!!!!!!!!!!!
-# brak edycji konta oraz usuwania konta
-# @login_required()
+@login_required()
 def edit_user_view(request):
     template_name = "user_account/user_edit.html"
     form = EditUserForm(request.POST or None, instance=request.user)
-    request.session['edit_succes'] = False
 
     if form.is_valid():
-        print("form.cleaned_data", form.cleaned_data)
-
-        if request.user.is_authenticated():
-            print(request.user.name, "USER IS LOGED IN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
         new_user_data = form.save()
-        new_user_data.set_password(form.cleaned_data['new_password_1'])
+        if form.cleaned_data['new_password_1']:
+            new_user_data.set_password(form.cleaned_data['new_password_1'])
+            request.session['new_password'] = True
+
         new_user_data.save()
+        update_session_auth_hash(request, request.user)  # umożliwia zmianę hasła użytkownika bez wylogowania
+
         request.session['edit_succes'] = True
-        # return redirect('/user_account/user_edit/')
         return HttpResponseRedirect('/user_account/user_edit/')
 
-        # return HttpResponse('/user_account/user_edit/')
+    edit_state = request.session['edit_succes'] if 'edit_succes' in request.session else None
+    new_password = request.session['new_password'] if 'new_password' in request.session else None
+    request.session['edit_succes'] = None
+    request.session['new_password'] = None
 
-
-    # nie działa context i session
-
-    edit_state = request.session['edit_succes']
     return render(request, template_name, {'form': form,
-                                           'edit_succes': True})
+                                           'edit_succes': edit_state,
+                                           'new_password': new_password})
 
 
 

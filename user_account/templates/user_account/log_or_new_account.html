@@ -11,22 +11,30 @@
         </div>
 
     {% else %}
+        <div id="'introduction">
+            Tutaj wstawić tekst opisujący trochę aplikacje i jej możliwości. !!!!! DO uzupełnienia.
+        </div>
+
+
+
         <div id="new_user">
         <form class='new_user' action="" method="post">
+            <table>
             {% csrf_token %}
             <p>Rejestracja nowego użytkownika</p>
-            {{ forms.new_user.as_p }}
+            {{ forms.new_user.as_table }}
+            </table>
             <button name='action' value='new_user' type="submit">Rejestruj</button>
         </form>
         </div>
 
         <div id="login">
-
         <form class='login' action="" method="post">
+            <table>
             {% csrf_token %}
-
             <p>Logowanie</p>
-            <p>{{ forms.login.as_p }}</p>
+            <p>{{ forms.login.as_table }}</p>
+            </table>
             <button name='action' value='login' type="submit">Zaloguj</button>
         </form>
         </div>
@@ -36,7 +44,7 @@
         <p>Uwaga, użytkownik jest nieaktywny, prosze aktywować swoje konto poprzez wykorzystanie linku aktywacyjnego
         <p>wysłanego na adres mailowy. A aktywacji możliwe będzie zalogowanie.
     {% elif user_is_none == True %}
-        <p>Uwaga, wprowadzony email oraz hasło nie pasują do siebie, albo nie istnieją.
+        <p>Uwaga, wprowadzony email oraz hasło nie pasują do siebie, albo użytkownik nie został utworzony.
     {% endif %}
 
     {% block layout %}

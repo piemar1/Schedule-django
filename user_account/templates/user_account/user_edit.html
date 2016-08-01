@@ -4,18 +4,26 @@
 {% block layout %}
 
     <form action="" method="post">
+        <table>
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Save" />
+        {{ form.as_table }}
+        </table>
+        <p>Z przyczyn bezpieczeństwa dotychczasowe Twoje hasło jest niewidoczne.
+            Możesz oczywiście zmienić hasło. W przeciwnym wypadku pozostaw pola puste.
+        <p><input type="submit" value="Save" />
     </form>
 
     <p> Dodać funkcje w JavaScript  sprawdzającą czy new_passwor1 == new_passwor1 !!!!</p>
 
     {% if edit_succes %}
-        <p>Dokonano zamiany danych konta użytkownika.
+        <p>Dokonano zamiany danych konta użytkownika {{user.name}} {{user.surname}}.
     {% endif %}
 
-    <p><a href="{% url 'user_account:home' %}">Powrót do strony domowej</a></p>
+    {% if new_password %}
+        <p>Dokonano zamiany hasła dostępu do konta użytkownika {{user.name}} {{user.surname}}.
+    {% endif %}
 
+
+    <p><a href="{% url 'user_account:home' %}">Powrót do strony domowej</a></p>
 
 {% endblock %}

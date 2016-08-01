@@ -260,7 +260,10 @@ def team_update(request):
                     team.delete()
 
                 # zapisanie team do bazy danych
-                a_team = Team(name=team_name, user=request.user)
+                a_team = Team(
+                    name=team_name,
+                    user=request.user
+                )
                 a_team.save()
 
                 # zapisanie osób przyporządkowanych do team w bazie danych

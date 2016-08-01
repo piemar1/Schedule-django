@@ -21,5 +21,5 @@ class EditUserForm(forms.ModelForm):
         model = User
         fields = ['email', 'name', 'surname']
 
-    new_password_1 = forms.CharField(max_length=30, min_length=8)
-    new_password_2 = forms.CharField(max_length=30, min_length=8)
+    new_password_1 = forms.CharField(max_length=30, min_length=8, required=False)
+    new_password_2 = forms.CharField(max_length=30, min_length=8, required=False)
