@@ -12,7 +12,9 @@ Requirements
 ------------
 
 Django 1.9.7
+
 psycopg2 2.4.5
+
 reportlab 3.3.0
 
 
