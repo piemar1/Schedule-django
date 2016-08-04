@@ -4,18 +4,18 @@ __author__ = 'Marcin Pieczyński'
 
 
 months = (
-    (u"styczeń", u"styczeń"),
-    (u"luty", u"luty"),
-    (u"marzec", u"marzec"),
-    (u"kwiecień", u"kwiecień"),
-    (u"maj", u"maj"),
-    (u"czerwiec", u"czerwiec"),
-    (u"lipiec", u"lipiec"),
-    (u"sierpień", u"sierpień"),
-    (u"wrzesień", u"wrzesień"),
-    (u"październik", u"październik"),
-    (u"listopad", u"listopad"),
-    (u"grudzień", u"grudzień")
+    ("styczeń", "styczeń"),
+    ("luty", "luty"),
+    ("marzec", "marzec"),
+    ("kwiecień", "kwiecień"),
+    ("maj", "maj"),
+    ("czerwiec", "czerwiec"),
+    ("lipiec", "lipiec"),
+    ("sierpień", "sierpień"),
+    ("wrzesień", "wrzesień"),
+    ("październik", "październik"),
+    ("listopad", "listopad"),
+    ("grudzień", "grudzień")
 )
 
 years = (
@@ -27,13 +27,13 @@ years = (
 )
 
 WEEK_DAYS = {
-    0: u"pn",
-    1: u"wt",
-    2: u"śr",
-    3: u"cz",
-    4: u"pt",
-    5: u"so",
-    6: u"n"
+    0: "pn",
+    1: "wt",
+    2: "śr",
+    3: "cz",
+    4: "pt",
+    5: "so",
+    6: "n"
 }
 
 WORKING_DAYS_NUMBER = {
@@ -57,9 +57,9 @@ WORKING_DAYS_NUMBER = {
 MONTHS = [m[0] for m in months]
 YEARS = range(2016, 2020)
 DEFAULT_TEAM = ["" for elem in range(15)]
-WORKING_DAYS = (u"pn", u"wt", u"śr", u"cz", u"pt")
-WORK = (u"D", u"N", u'U', u".")
-TYPE_OF_WORK = (u"D", u"N")
-NIGHT = u"N"
-DAY = u"D"
-FREE_DAY = u"."
+WORKING_DAYS = ("pn", "wt", "śr", "cz", "pt")
+WORK = ("D", "N", 'U', ".")
+TYPE_OF_WORK = ("D", "N")
+NIGHT = "N"
+DAY = "D"
+FREE_DAY = "."

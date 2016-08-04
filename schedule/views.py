@@ -6,11 +6,10 @@ __author__ = 'Marcin Pieczyński'
 import datetime
 import calendar
 
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -51,8 +50,7 @@ def get_month_calendar(selected_year, selected_month):
         if week_day == 7:
             week_day = 0
 
-    month_calendar = list(zip([elem + 1 for elem in range(day_no)], week_days))
-    return month_calendar
+    return list(zip([elem + 1 for elem in range(day_no)], week_days))
 
 
 def get_number_of_working_days_month(month_calendar):
@@ -76,6 +74,14 @@ def get_no_of_workdays(month_working_days):
     return
 
 
+def get_user_teams(request):
+    return Team.objects.filter(user=request.user)
+
+
+def get_user_schedules(request):
+    return Schedule.objects.filter(user=request.user)
+
+
 def main_context(request):
     """
     Funkcja zwraca podstawową zawartość context.
@@ -85,8 +91,8 @@ def main_context(request):
         'years': YEARS,
         'current_month': current_month(),
         'current_year': current_year(),
-        'teams': Team.objects.filter(user=request.user),
-        'schedules': Schedule.objects.filter(user=request.user),
+        'teams': get_user_teams(request),
+        'schedules': get_user_schedules(request),
         'default_team_name': today(),
         'default_schedule_name': today(),
         'dafault_team_size': DEFAULT_TEAM,
@@ -100,38 +106,45 @@ def main_context(request):
     return default_context
 
 
-# widok podstawowy
 @login_required()
 def main_page(request):
+    """
+    Base schedule view.
+    """
     context = main_context(request)
     return render(request, 'schedule/_base.html', context)
 
 
-# widok nowego zespołu
 @login_required()
 def new_team(request):
+    """
+    New Team view.
+    """
     context = main_context(request)
     return render(request, 'schedule/new_team.html', context)
 
 
-# widok istniejących zespołów
 class TeamDetailView(LoginRequiredMixin, generic.TemplateView):
+    """
+    Generic view of existing Team.
+    """
+
     template_name = 'schedule/team.html'
 
     def get_context_data(self, **kwargs):
-        # implementuje get_context_date z Clasy generic.DetailView
-        context = super(TeamDetailView, self).get_context_data(**kwargs)
-        # Dodaje pozostałą zawartość do context
-        context.update(main_context(self.request))
+        # Implementing get_context_date from generic.DetailView class
 
+        context = super(TeamDetailView, self).get_context_data(**kwargs)
+        context.update(main_context(self.request))
         team_to_edit = get_object_or_404(Team, name=self.request.session["team_name_to_edit"])
         context['team'] = team_to_edit
         return context
 
 
-# działanie przycisków w głównym oknie programu
 def grafik_update(request):
-
+    """"
+    Function with button action in main schedule view.
+    """
     if request.POST:
         context = main_context(request)
 
@@ -159,10 +172,12 @@ def grafik_update(request):
                 team_name_for_new_schedule = request.POST["team_for_new_schedule"]
                 month_calendar = get_month_calendar(selected_year, selected_month)
 
-                request.session["team_name"] = team_name_for_new_schedule
-                request.session["month_calendar"] = month_calendar
-                request.session["selected_month"] = selected_month
-                request.session["selected_year"] = selected_year
+                request.session.update({
+                    "team_name": team_name_for_new_schedule,
+                    "month_calendar": month_calendar,
+                    "selected_month": selected_month,
+                    "selected_year": selected_year
+                })
                 return HttpResponseRedirect('/schedule/new_schedule/')
 
             except KeyError:
@@ -183,46 +198,55 @@ def grafik_update(request):
             return HttpResponseRedirect('/schedule/' + str(schedule_to_edit.pk) + '/schedule/')
 
 
-# widok nowego grafiku
 @login_required()
 def new_schedule(request):
-
+    """
+    View of new schedule.
+    """
     context = main_context(request)
     month_calendar = request.session["month_calendar"]
-    context["month_calendar"] = month_calendar
-    context["selected_month"] = request.session["selected_month"]
-    context["selected_year"] = request.session["selected_year"]
-    context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
-    context['team'] = Team.objects.get(name=request.session["team_name"])
+    context.update({
+        "month_calendar": month_calendar,
+        "selected_month": request.session["selected_month"],
+        "selected_year": request.session["selected_year"],
+        "working_days": WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1],
+        "team": Team.objects.get(name=request.session["team_name"])
+    })
     return render(request, 'schedule/new_schedule.html', context)
 
 
-# widok istniejącego grafiku
 @login_required()
 def existed_schedule(request, pk):
-
+    """
+    View of existing schedule from database.
+    """
     current_schedule = Schedule.objects.get(pk=pk)
 
     month_calendar = current_schedule.get_month_calendar()
     one_schedules = current_schedule.oneschedule_set.all()
     small_schedules = [[one_schedule.person.name, one_schedule.one_schedule] for one_schedule in one_schedules]
 
-    request.session["team_name"] = current_schedule.crew.name
-    request.session["selected_month"] = current_schedule.month
-    request.session["selected_year"] = current_schedule.year
-    request.session["month_calendar"] = month_calendar
+    request.session.update({
+        "team_name": current_schedule.crew.name,
+        "selected_month": current_schedule.month,
+        "selected_year": current_schedule.year,
+        "month_calendar": month_calendar
+    })
 
     context = main_context(request)
-    context["month_calendar"] = month_calendar
-    context["current_schedule"] = current_schedule
-    context["small_schedules"] = small_schedules
-    context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
+    context.update({
+        "month_calendar": month_calendar,
+        "current_schedule": current_schedule,
+        "small_schedules": small_schedules,
+        "working_days": WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
+    })
     return render(request, 'schedule/schedule.html', context)
 
 
-# obsługa przycisków w oknie z edycją drużyn
 def team_update(request):
-
+    """"
+    Function with button action in team view.
+    """
     if request.POST:
 
         # zapisywanie drużyny do bazy danych
@@ -230,7 +254,7 @@ def team_update(request):
             context = main_context(request)
             try:
                 team_name = request.POST["team_name"].strip()
-                # czytanie obecnej drużyny z widoku
+                # odczytanie obecnej drużyny z widoku
                 person_list = [key for key in request.POST.keys() if "person" in key]
                 crew = [request.POST[person].strip() for person in person_list if request.POST[person].strip()]
 
@@ -255,8 +279,8 @@ def team_update(request):
 
             try:
                 # usuwanie team z bazy danych jeśli istnieje team o zadanej nazwie
-                if team_name in [team.name for team in Team.objects.all()]:
-                    team = Team.objects.get(name=team_name)
+                if team_name in [team.name for team in get_user_teams(request)]:
+                    team = Team.objects.get(name=team_name, user=request.user)
                     team.delete()
 
                 # zapisanie team do bazy danych
@@ -276,27 +300,28 @@ def team_update(request):
                 context["error_message"] = "Wystąpił błąd podczas zapisu zespołu {}. Sprubuj ponownie." \
                                            "Jeżeli sytuacja będzie się powtarzać spoknatkuj się z " \
                                            "administratorem.".format(team_name)
-                context["default_team_name"] = team_name
-                context["dafault_team_size"] = crew
+                context.update({
+                    "default_team_name": team_name,
+                    "dafault_team_size": crew
+                })
                 return render(request, "schedule/new_team.html", context)
 
             team = Team.objects.get(name=team_name)
             request.session["team_name_to_edit"] = team.name
-
             return HttpResponseRedirect(reverse('schedule:team', args=(team.pk,)))
 
 
-# obsługa przycisków w widoku z edycją grafików
 def schedule_update(request):
-
+    """"
+    Function with button action in schedule view.
+    """
     if request.POST:
         selected_month = request.session["selected_month"]
         selected_year = request.session["selected_year"]
         month_calendar = request.session["month_calendar"]
-
         schedule_name = request.POST['schedule_name']
-        team_for_new_schedule = get_object_or_404(Team, name=request.session["team_name"])
 
+        team_for_new_schedule = get_object_or_404(Team, name=request.session["team_name"])
         crew = team_for_new_schedule.person_set.all()
 
         # odczytywanie ze strony grafiku dla poszczególnych osób
@@ -306,15 +331,15 @@ def schedule_update(request):
             for no, day in month_calendar:
                 one_day = request.POST[person.name + u'_day' + str(no)]
                 person_schedule.append(one_day)
-            schedules.append("".join(person_schedule))
+            schedules.append(''.join(person_schedule))
 
         # zapisywanie grafiku
         if "_save_schedule" in request.POST:
 
             try:
                 # usunięcie grafiku z bazy, jeśli istnieje już grafik o takiej nazwie
-                if schedule_name in [schedule.name for schedule in Schedule.objects.all()]:
-                    schedule_to_delete = Schedule.objects.get(name=schedule_name)
+                if schedule_name in [schedule.name for schedule in get_user_schedules(request)]:
+                    schedule_to_delete = Schedule.objects.get(name=schedule_name, user=request.user)
                     schedule_to_delete.delete()
 
                 # stworzenie obiektu nowego grafiku
@@ -329,8 +354,13 @@ def schedule_update(request):
                 current_schedule.save()
 
                 # tworzenie obiektów OneSchedule wewnątrz grafiku
-                one_schedules = [OneSchedule(one_schedule=person_schedule, schedule=current_schedule, person=person) for
-                                 person, person_schedule in zip(crew, schedules)]
+                one_schedules = [
+                    OneSchedule(
+                        one_schedule=person_schedule,
+                        schedule=current_schedule,
+                        person=person
+                    ) for person, person_schedule in zip(crew, schedules)
+                ]
 
                 # zapisywanie obiektów OneSchedule wewnątrz grafiku do basy danych
                 for one_schedule in one_schedules:
@@ -340,78 +370,79 @@ def schedule_update(request):
 
             except KeyError:
                 context = main_context(request)
-                context["current_schedule_name"] = schedule_name
-                context["month_calendar"] = month_calendar
-                context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
-                context["small_schedules"] = [[person.name, schedule] for person, schedule in zip(crew, schedules)]
-
-                context["error_message"] = "Wystąpił błąd podczas zapisu grafiku {}. Sprubuj ponownie." \
-                                           "Jeżeli sytuacja będzie się powtarzać spoknatkuj się z " \
-                                           "administratorem.".format(schedule_name)
+                context.update({
+                    "current_schedule_name": schedule_name,
+                    "month_calendar": month_calendar,
+                    "working_days": WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1],
+                    "small_schedules": [[person.name, schedule] for person, schedule in zip(crew, schedules)],
+                    "error_message": "Wystąpił błąd podczas zapisu grafiku {}. Sprubuj ponownie."
+                                     "Jeżeli sytuacja będzie się powtarzać spoknatkuj się z "
+                                     "administratorem.".format(schedule_name)
+                })
                 return render(request, 'schedule/schedule.html', context)
 
-        # export grafiku do pliku pdf
-        if "_export_schedule_as_pdf" in request.POST:
-
-            import io
-            from .write_pdf import WritePDF
-
+        else:
             # tworzenie obiektów OneSchedule wewnątrz grafiku
-            one_schedules = [OneSchedule(one_schedule=person_schedule, person=person) for
-                             person, person_schedule in zip(crew, schedules)]
+            one_schedules = [
+                OneSchedule(
+                    one_schedule=person_schedule,
+                    person=person
+                ) for person, person_schedule in zip(crew, schedules)
+            ]
 
             month_working_days = request.POST["no_of_working_days_in_nonth"]
             no_of_workdays = get_no_of_workdays(month_working_days)
 
-            response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename="grafik.pdf"'
+            # export grafiku do pliku pdf
+            if "_export_schedule_as_pdf" in request.POST:
 
-            buffor = io.BytesIO()
-            pdf_buffor = WritePDF(buffor, selected_year, selected_month, one_schedules,
-                                  month_calendar, month_working_days, no_of_workdays)
+                import io
+                from .write_pdf import WritePDF
 
-            pdf_buffor.run()
-            pdf = buffor.getvalue()
-            buffor.close()
-            response.write(pdf)
+                response = HttpResponse(content_type='application/pdf')
+                response['Content-Disposition'] = 'attachment; filename="grafik.pdf"'
 
-            return response
+                buffor = io.BytesIO()
+                pdf_buffor = WritePDF(buffor, selected_year, selected_month, one_schedules,
+                                      month_calendar, month_working_days, no_of_workdays)
+                pdf_buffor.run()
+                pdf = buffor.getvalue()
+                buffor.close()
+                response.write(pdf)
+                return response
 
-        # automatyczne wypełnianie grafiku wedlug zadanych parametrów
-        if "_fill_schedule" in request.POST:
+            # automatyczne wypełnianie grafiku wedlug zadanych parametrów
+            elif "_fill_schedule" in request.POST:
 
-            context = main_context(request)
-            # schedule_name = request.POST['schedule_name']
-            # month_calendar = request.session["month_calendar"]
-            context["current_schedule_name"] = schedule_name
-            context["month_calendar"] = month_calendar
-            context["working_days"] = WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
+                context = main_context(request)
+                context.update({
+                    "current_schedule_name": schedule_name,
+                    "month_calendar": month_calendar,
+                    "working_days": WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
+                })
 
-            person_per_day = int(request.POST["no_of_person_day"])
-            person_per_night = int(request.POST["no_of_person_night"])
-            month_working_days = request.POST["no_of_working_days_in_nonth"]
+                person_per_day = int(request.POST["no_of_person_day"])
+                person_per_night = int(request.POST["no_of_person_night"])
 
-            no_of_workdays = get_no_of_workdays(month_working_days)
-            one_schedules = [OneSchedule(one_schedule=person_schedule, person=person) for
-                             person, person_schedule in zip(crew, schedules)]
+                from .fill_schedule import fill_the_schedule
 
-            from .fill_schedule import fill_the_schedule
+                number_of_tries = 10
+                while number_of_tries:
+                    try:
+                        new_one_schedules = fill_the_schedule(one_schedules, no_of_workdays,
+                                                              person_per_day, person_per_night)
 
-            number_of_tries = 10
-            while number_of_tries:
-                try:
-                    new_one_schedules = fill_the_schedule(one_schedules, no_of_workdays,
-                                                          person_per_day, person_per_night)
+                        context["small_schedules"] = [[one_schedule.person.name, one_schedule.one_schedule]
+                                                      for one_schedule in new_one_schedules]
+                        return render(request, 'schedule/schedule.html', context)
 
-                    context["small_schedules"] = [[one_schedule.person.name, one_schedule.one_schedule]
-                                                  for one_schedule in new_one_schedules]
-                    return render(request, 'schedule/schedule.html', context)
+                    except IndexError:
+                        number_of_tries -= 1
 
-                except IndexError:
-                    number_of_tries -= 1
-
-            context["error_message"] = "Atomatyczne uzupełnienie grafiku {} nie powiodło się !!! ;-(" \
-                                       "Zalecamy zmianę parametrów automatycznego uzupełniania grafiku " \
-                                       "na mniej wymagające.".format(schedule_name)
-            context["small_schedules"] = [[person.name, schedule] for person, schedule in zip(crew, schedules)]
-            return render(request, 'schedule/schedule.html', context)
+                context.update({
+                    "error_message": "Atomatyczne uzupełnienie grafiku {} nie powiodło się !!! ;-("
+                                     "Zalecamy zmianę parametrów automatycznego uzupełniania grafiku "
+                                     "na mniej wymagające.".format(schedule_name),
+                    "small_schedules": [[person.name, schedule] for person, schedule in zip(crew, schedules)]
+                })
+                return render(request, 'schedule/schedule.html', context)

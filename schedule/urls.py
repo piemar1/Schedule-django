@@ -10,7 +10,6 @@ from . import views
 
 
 urlpatterns = [
-
     url(r'^$', views.main_page, name='main_page'),
 
     url(r'^grafik_update/$', views.grafik_update, name='grafik_update'),
@@ -22,5 +21,4 @@ urlpatterns = [
 
     url(r'^team_update/$', views.team_update, name='team_update'),
     url(r'^schedule_update/$', views.schedule_update, name='schedule_update'),
-
 ]

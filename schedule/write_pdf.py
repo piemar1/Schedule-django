@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
-
 __author__ = 'Marcin Pieczyński'
 
 import os
@@ -15,7 +14,6 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 from .models import *
-
 
 
 path = os.path.dirname(os.path.realpath(__file__)) + "/static/fonts/"
@@ -38,7 +36,8 @@ class WritePDF:
     """
     Klasa zawierająca potrzebne metody do zapisu grafiku schedule w postaci tabeli w pliku pdf.
     """
-    def __init__(self, file_like_handle, year, month, one_schedules, month_calendar, month_working_days, no_of_workdays):
+    def __init__(self, file_like_handle, year, month, one_schedules,
+                 month_calendar, month_working_days, no_of_workdays):
         """Constructor"""
 
         self.year = year
@@ -56,7 +55,7 @@ class WritePDF:
         """
         Run the report
         """
-        def make_landscape(canvas,doc):
+        def make_landscape(canvas, doc):
             canvas.setPageSize(landscape(A4))
 
         # file initialization in buffer
@@ -71,7 +70,8 @@ class WritePDF:
             self.doc.leftMargin-65,
             self.doc.bottomMargin - 50,
             self.doc.width + 125,
-            self.doc.height + 110, id='first_frame'
+            self.doc.height + 110,
+            id='first_frame'
         )
 
         # add the PageTempaltes to the BaseDocTemplate.
@@ -80,7 +80,8 @@ class WritePDF:
             PageTemplate(
                 id='first_page',
                 frames=frame,
-                onPage=make_landscape)
+                onPage=make_landscape
+            )
         )
         self.create_text()
         self.create_table()
@@ -126,12 +127,11 @@ class WritePDF:
         data.append(line)
 
         # zbieranie info o columnach danych dla soboty i niedzieli
-        weekend_columns = [n for n, elem in enumerate(line) if elem in ["so", "n"]]
+        weekend_columns = [n for n, elem in enumerate(line) if elem in ("so", "n")]
 
         # wypełnianie tabeli dla poszczególnych osób
         for n, one_schedule in enumerate(self.one_schedules):
-
-            line = ["{}.".format(str(n +1 )), one_schedule.person.name]
+            line = ["{}.".format(str(n + 1)), one_schedule.person.name]
             line.extend(list(one_schedule.one_schedule))
             line.append(one_schedule.get_number_of_days())
             line.append(one_schedule.get_number_of_nights())
@@ -152,16 +152,18 @@ class WritePDF:
         table.hAlign = "CENTRE"
 
         # styl tabeli
-        mytablestyle = [("FONTNAME", (0,0),(-1,-1), 'Tinos-Regular'),
-                        ("FONTSIZE", (0,0),(-1,-1), 8.0),
-                        ("SPAN", (0,0), (0,1)),
-                        ("SPAN", (1,0), (1,1)),
-                        ('ALIGN',(0,0),(-1,-1),'CENTER'),
-                        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
-                        ('FONTNAME', (0,0), (-1,1), 'Tinos-Bold'),
-                        ('FONTNAME', (0,0), (1,-1), 'Tinos-Bold'),
-                        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                        ('BOX', (0,0), (-1,-1), 0.25, colors.black)]
+        mytablestyle = [
+            ("FONTNAME", (0,0),(-1,-1), 'Tinos-Regular'),
+            ("FONTSIZE", (0,0),(-1,-1), 8.0),
+            ("SPAN", (0,0), (0,1)),
+            ("SPAN", (1,0), (1,1)),
+            ('ALIGN',(0,0),(-1,-1),'CENTER'),
+            ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+            ('FONTNAME', (0,0), (-1,1), 'Tinos-Bold'),
+            ('FONTNAME', (0,0), (1,-1), 'Tinos-Bold'),
+            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+            ('BOX', (0,0), (-1,-1), 0.25, colors.black)
+        ]
 
         # dodanie do stylu tabeli kolorów dla soboty i niedzieli
         mytablestyle.extend(color_col)
@@ -176,7 +178,6 @@ class WritePDF:
         p = Paragraph(header_text, styles['myStyleLEFT'])
         self.story.append(Spacer(1, 0.5*cm))
         self.story.append(p)
-
 
     def create_footer(self):
         header_text = u"Grafik przygotowany w programie GrafikIwonki, kontakt marcin-pieczynski@wp.pl"

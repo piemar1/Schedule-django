@@ -1,18 +1,24 @@
+__author__ = 'Marcin Pieczyński'
 
 import datetime
 
-from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.db import models
 from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, password, active, staff, superuser,
-                       **extra_fields):
+    def _create_user(self, email, password, active, staff, superuser, **extra_fields):
         now = timezone.now()
         email = self.normalize_email(email)
-        user = self.model(email=email, staff=staff, active=active,
-                          superuser=superuser, register_date=now, **extra_fields)
+        user = self.model(
+            email=email,
+            staff=staff,
+            active=active,
+            superuser=superuser,
+            register_date=now,
+            **extra_fields
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -22,13 +28,12 @@ class UserManager(BaseUserManager):
                                  last_login=datetime.datetime.now(), **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
-        user=self._create_user(email, password, True, True, True, **extra_fields)
+        user = self._create_user(email, password, True, True, True, **extra_fields)
         user.save(using=self._db)
         return user
 
 
 class User(AbstractBaseUser):
-
 
     email = models.EmailField(max_length=100, unique=True)
     name = models.CharField(max_length=50)
@@ -72,3 +77,6 @@ class User(AbstractBaseUser):
 
     def get_last_login(self):
         return self.last_login
+
+    def get_full_name(self):
+        return '{} {}'.format(self.name, self.surname)

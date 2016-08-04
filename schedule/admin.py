@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
+#!/usr/bin/python
+__author__ = 'Marcin Pieczyński'
+
 from django.contrib import admin
 from user_account.models import User
 from .models import Person, Team, Schedule, OneSchedule
-
-
 
 
 class PersonInLine(admin.TabularInline):
@@ -16,7 +18,7 @@ class TeamAdmin(admin.ModelAdmin):
         ('Team Name', {'fields': ['name']}),
     ]
     inlines = [PersonInLine]
-    list_display = ('name', 'user')   # dodaje koluny tabeli
+    list_display = ('name', 'user')
 
 
 class ScheduleAdmin(admin.ModelAdmin):
@@ -25,9 +27,9 @@ class ScheduleAdmin(admin.ModelAdmin):
         ('Schedule name', {'fields': ['name']}),
         ('Month', {'fields': ['month']}),
         ('Year', {'fields': ['year']}),
-        ('Team',{'fields': ['crew']}),
+        ('Team', {'fields': ['crew']}),
     ]
-    list_display = ('name', 'user', 'crew', 'month', 'year')   # dodaje koluny tabeli
+    list_display = ('name', 'user', 'crew', 'month', 'year')
     list_filter = ['user']
     search_fields = ['name', 'month', 'year']
 

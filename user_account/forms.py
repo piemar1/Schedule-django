@@ -1,5 +1,6 @@
-from django import forms
+__author__ = 'Marcin Pieczyński'
 
+from django import forms
 from user_account.models import User
 
 
