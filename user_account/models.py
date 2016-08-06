@@ -25,7 +25,7 @@ class UserManager(BaseUserManager):
 
     def create_user(self, email=None, password=None, **extra_fields):
         return self._create_user(email, password, False, False, False,
-                                 last_login=datetime.datetime.now(), **extra_fields)
+                                 last_login=timezone.now(), **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
         user = self._create_user(email, password, True, True, True, **extra_fields)
