@@ -36,8 +36,9 @@ def create_superuser(time=timezone.now()):
 
 class UserMethodTests(TestCase):
     """
-    Test for methods of User model.
+    Tests for methods of User model.
     """
+
     def test_get_email(self):
         """Test for method get_mail - should return email of user object. """
         user = create_user()
@@ -84,7 +85,7 @@ class UserMethodTests(TestCase):
 
 class SuperUserTests(TestCase):
     """
-    Test for methods of User model.
+    Tests for methods of User model.
     """
     def test_get_email(self):
         """Test for method get_mail - should return email of super_user object. """
@@ -115,7 +116,6 @@ class SuperUserTests(TestCase):
         """Test for method module_perms - should return True for super_user object. """
         super_user = create_superuser()
         self.assertEqual(super_user.has_module_perms(app_label=None), True)
-
 
     def test_get_last_login(self):
         """Test for method get_last_login -

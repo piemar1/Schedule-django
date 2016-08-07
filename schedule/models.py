@@ -105,18 +105,19 @@ class OneSchedule(models.Model):
 
     def filtre_work_days_in_month(self, no_of_working_days):
         """
-        Metoda zwraca True jeśli osoba ma mniej dni roboczych w miesiącu niż no_of_working_days, inaczej False.
+        Metoda zwraca True jeśli osoba ma mniej lyb tyle samo dni roboczych
+        w miesiącu niż no_of_working_days, inaczej False.
         """
         return self.get_working_days_number_person() <= no_of_working_days
 
     def filtre_double_work(self, day_number, work):
         """
-        Metoda zwraca False jeśli dodanie dyżuru D spowoduje powstanie dyżuri 24 h ND, inaczej True
+        Metoda zwraca False jeśli dodanie dyżuru D lub N spowoduje powstanie dyżuru 24h ND, inaczej True
         """
         if day_number == 0 and work == NIGHT and self.one_schedule[day_number + 1] == DAY:
             return False
 
-        elif 0 < day_number < len(self.one_schedule)-1:
+        else:
             if work == NIGHT and self.one_schedule[day_number + 1] == DAY:
                 return False
 
@@ -126,16 +127,12 @@ class OneSchedule(models.Model):
 
     def filtre_work_days_in_week(self, no_of_working_days, day_number):
         """
-        Metoda zwraca True jeśli liczba dni roboczych w one_schedule w tygodniu nie przekracza 4, inaczej False.
+        Metoda zwraca True jeśli liczba dni roboczych w one_schedule w tygodniu nie przekracza no_of_working_days,
+        inaczej False.
         """
+        schedule_part = self.one_schedule[:day_number] if day_number <= 6 \
+            else self.one_schedule[day_number - 7: day_number]
 
-        schedule_part = self.one_schedule[:day_number] \
-            if day_number <= 6 else self.one_schedule[day_number - 7: day_number]
+        return schedule_part.count(NIGHT) + schedule_part.count(DAY) < no_of_working_days
 
-        number = 0
-        for day in schedule_part:
-            if day in TYPE_OF_WORK:
-                number += 1
-        if number > no_of_working_days:
-            return False
-        return True
+
