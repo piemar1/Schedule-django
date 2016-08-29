@@ -8,6 +8,8 @@
         <p>Udane Logowanie ;-) Witam <code>{{ user.name }}</code>!</p>
         <p><a href="{% url 'user_account:user_edit' %}">Edycja konta</a></p>
         <p><a href="{% url 'user_account:logout' %}">Wyloguj</a></p>
+
+            Wprowadzić zmianę koloru linków kiedy najdzie na nie myszka !!!!!
         </div>
 
     {% else %}
@@ -17,21 +19,22 @@
 
         <div id="new_user">
         <form class='new_user' action="" method="post">
-            <table>
+            <table id="register_table">
+            <caption><b>Rejestracja nowego użytkownika</b></caption>
             {% csrf_token %}
-            <p>Rejestracja nowego użytkownika</p>
-            {{ forms.new_user.as_table }}
+            <li id="register_form" class="register_login_form"> {{ forms.new_user.as_table }} </li>
             </table>
-            <button name='action' value='new_user' type="submit">Rejestruj</button>
+            <button name='action' value='new_user' type="submit" onclick="sayHello()">Rejestruj</button>
         </form>
         </div>
 
+
         <div id="login">
         <form class='login' action="" method="post">
-            <table>
+            <table id="login_table">
+            <caption><b>Logowanie</b></caption>
             {% csrf_token %}
-            <p>Logowanie</p>
-            <p>{{ forms.login.as_table }}</p>
+            <li id="login_form" class="register_login_form"> {{ forms.login.as_table }} </li>
             </table>
             <button name='action' value='login' type="submit">Zaloguj</button>
         </form>

@@ -13,7 +13,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from user_account.models import User    # needed ???
+from user_account.models import User
 from .models import Team, Schedule, Person, OneSchedule
 from .solid_data import *
 

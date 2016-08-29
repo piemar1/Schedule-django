@@ -1,8 +1,7 @@
 <!DOCTYPE html>
     <html lang="{% block page_language %}pl{% endblock %}">
     <head>
-        {% block static_files %}
-        {% endblock %}
+        {% block static_files %}{% endblock %}
         <meta charset="utf-8" />
         <title>{% block page_title %}Grafik{% endblock %}</title>
     </head>
@@ -16,7 +15,10 @@
         {% endblock %}
 		
 		<div id="footer">
-		Opracował Marcin Pieczyński, kontakt marcin-pieczynski@wp.pl
+		<address>
+            Created by Marcin Pieczyński <br>
+            marcin-pieczynski@wp.pl
+        </address>
 		</div>
     </body>
 </html>

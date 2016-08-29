@@ -37,3 +37,8 @@ body {
     float:left;
     padding:5px
     }
+
+table#login_table, table#register_table {
+    width: 50%;
+    background-color: #f1f1c1;
+}
