@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
 __author__ = 'Marcin Pieczyński'
@@ -130,8 +131,7 @@ class OneSchedule(models.Model):
         Metoda zwraca True jeśli liczba dni roboczych w one_schedule w tygodniu nie przekracza no_of_working_days,
         inaczej False.
         """
-        schedule_part = self.one_schedule[:day_number] if day_number <= 6 \
-            else self.one_schedule[day_number - 7: day_number]
+        schedule_part = self.one_schedule[:day_number] if day_number <= 6 else self.one_schedule[day_number - 7: day_number]
 
         return schedule_part.count(NIGHT) + schedule_part.count(DAY) < no_of_working_days
 

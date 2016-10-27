@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.pyc
 
 # C extensions
 *.so
@@ -88,15 +87,3 @@ ENV/
 
 # Rope project settings
 .ropeproject
-
-# PyCharm directory
-.idea/
-
-# npm and gulp
-node_modules/
-static/
-media/
-
-# SQLite database
-*.sqlite3
-*.sqlite
