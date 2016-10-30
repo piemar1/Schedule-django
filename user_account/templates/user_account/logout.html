@@ -3,8 +3,9 @@
 
 {% block base_layout %}
 
-<p>Nastąpiło poprawne wylogowanie.</p>
-<br>
-<p><a href="{% url 'user_account:register' %}">Powrót do strony logowania</a></p>
-
+<div id="user_logout_info">
+    <p>Nastąpiło poprawne wylogowanie.</p>
+    <br>
+    <p><a href="{% url 'user_account:register' %}">Powrót do strony logowania</a></p>
+</div>
 {% endblock %}

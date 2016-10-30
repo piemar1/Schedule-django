@@ -3,21 +3,20 @@
     <head>
         {% block static_files %}{% endblock %}
         <meta charset="utf-8" />
-        <title>{% block page_title %}Grafik{% endblock %}</title>
+        <title>{% block page_title %}TeamWorkSchedule{% endblock %}</title>
     </head>
     <body>
 
-        <div id="header">
-			<h1>GrafikIwonki</h1>
+        <div id="header" style="color:white; background-color:#3333cc; text-align:center; padding:5px;">
+			<h1><i>Team Work Schedule</i></h1>
 		</div>
 
         {% block base_layout %}
         {% endblock %}
 		
-		<div id="footer">
+		<div id="footer" style="color:white; background-color:#3333cc; text-align:center; padding:5px;">
 		<address>
-            Created by Marcin Pieczyński <br>
-            marcin-pieczynski@wp.pl
+            Created by Marcin Pieczyński, marcin-pieczynski@wp.pl
         </address>
 		</div>
     </body>

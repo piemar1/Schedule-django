@@ -15,8 +15,17 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.shortcuts import HttpResponseRedirect
+
+
+def view_login(request):
+    """ Funkcja przekierowująca do głównego url aplikacji user_account."""
+    return HttpResponseRedirect("/user_account/")
 
 urlpatterns = [
+
+    # przekierowanie do widoku logiwania z aplikacji user_account przy starcie projektu
+    url(r'^$', view_login),
 
     # ex: /admin/
     url(r'^admin/', admin.site.urls),

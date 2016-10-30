@@ -3,30 +3,32 @@
 
 {% block base_layout %}
 
+    <div id="login_or_account_creation">
     {% if user.is_authenticated %}
+        <div id="edit_logout_links">
+        <p><a href="{% url 'user_account:user_edit' %}">Edycja konta</a>
+            <a href="{% url 'user_account:logout' %}">Wyloguj</a>
+        </p>
+        </div>
         <div id="user_is_authenticated">
-        <p>Udane Logowanie ;-) Witam <code>{{ user.name }}</code>!</p>
-        <p><a href="{% url 'user_account:user_edit' %}">Edycja konta</a></p>
-        <p><a href="{% url 'user_account:logout' %}">Wyloguj</a></p>
-
-            Wprowadzić zmianę koloru linków kiedy najdzie na nie myszka !!!!!
+            <p>Witaj {{ user.name }}!</p>
         </div>
 
     {% else %}
-        <div id="'introduction">
-            Tutaj wstawić tekst opisujący trochę aplikacje i jej możliwości. !!!!! DO uzupełnienia.
+        <div id="introduction">
         </div>
 
-        <div id="new_user">
         <form class='new_user' action="" method="post">
+        <div id="new_user">
+
             <table id="register_table">
             <caption><b>Rejestracja nowego użytkownika</b></caption>
             {% csrf_token %}
-            <li id="register_form" class="register_login_form"> {{ forms.new_user.as_table }} </li>
+            {{ forms.new_user.as_table }}
             </table>
             <button name='action' value='new_user' type="submit" onclick="sayHello()">Rejestruj</button>
-        </form>
         </div>
+        </form>
 
 
         <div id="login">
@@ -34,18 +36,23 @@
             <table id="login_table">
             <caption><b>Logowanie</b></caption>
             {% csrf_token %}
-            <li id="login_form" class="register_login_form"> {{ forms.login.as_table }} </li>
+            {{ forms.login.as_table }}
             </table>
             <button name='action' value='login' type="submit">Zaloguj</button>
         </form>
         </div>
     {% endif %}
+    </div>
 
     {% if user_is_active == False %}
+        <div id="inactive_user">
         <p>Uwaga, użytkownik jest nieaktywny, prosze aktywować swoje konto poprzez wykorzystanie linku aktywacyjnego
-        <p>wysłanego na adres mailowy. A aktywacji możliwe będzie zalogowanie.
+        <p>wysłanego na adres mailowy. Po aktywacji możliwe będzie zalogowanie.
+        </div>
     {% elif user_is_none == True %}
+        <div id="wrong_email_pass">
         <p>Uwaga, wprowadzony email oraz hasło nie pasują do siebie, albo użytkownik nie został utworzony.
+        </div>
     {% endif %}
 
     {% block layout %}

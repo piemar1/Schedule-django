@@ -1,13 +1,46 @@
-body {
-    background-color: light-grey;
+
+
+
+table#login_table,
+table#register_table,
+table#user_edition_table {
+    text-align:center;
+    width: 100%;
+    background-color: LightGrey ;
 }
 
-#header {
-    background-color:black;
-    color:white;
+#new_user,
+#login,
+#user_edition {
     text-align:center;
-    padding:5px;
-    }
+    margin: auto;
+    width: 30%;
+}
+
+#inactive_user, #wrong_email_pass {
+    text-align:center;
+    color: red
+}
+
+#user_activation_info,
+#user_logout_info,
+#user_is_authenticated,
+#password_edit,
+#account_edit,
+#account_creation,
+#link_after_account_edition {
+    text-align:center;
+}
+
+#edit_logout_links {
+    text-align:right;
+}
+
+
+
+
+
+
 #flash {
     color:green;
     text-align:center;
@@ -16,12 +49,7 @@ body {
 #main {
     background-color:#eeeeee;
     }
-#footer {
-    background-color:black;
-    color:white;
-    text-align:center;
-    padding:5px;
-    }
+
 #new_schedule {
     background-color:#aeeee1;
     float:left;
@@ -38,7 +66,6 @@ body {
     padding:5px
     }
 
-table#login_table, table#register_table {
-    width: 50%;
-    background-color: #f1f1c1;
-}
+
+
+

@@ -1,0 +1,17 @@
+body {
+    background-color: white ;
+}
+
+#header {
+    background-color:#3333cc;
+    color:white;
+    text-align:center;
+    padding:5px;
+    }
+
+#footer {
+    background-color:#3333cc;
+    color:white;
+    text-align:center;
+    padding:5px;
+    }

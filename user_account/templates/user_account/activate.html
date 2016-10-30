@@ -1,11 +1,11 @@
 {% extends "user_account/_base.html" %}
 
 {% block layout %}
-
-    <h1>Witamy {{name}}, twoje konto jest teraz w pełni aktywne.</h1>
-
-    <br>
-    <a href="{% url 'user_account:register' %}">Powrót do strony logowania</a>
+    <div id="user_activation_info">
+        <h1>Witamy {{name}}, twoje konto jest teraz w pełni aktywne.</h1>
+        <br>
+        <a href="{% url 'user_account:register' %}">Powrót do strony logowania</a>
+    </div>
 
 
 {% endblock %}
