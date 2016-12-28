@@ -99,7 +99,7 @@ def main_context(request):
         'possible_no_of_person_night': range(10),
         'possible_no_of_person_day': range(10),
         'dafoult_no_of_person_night': 2,
-        'dafoult_no_of_person_day': 4,
+        'dafoult_no_of_person_day': 2,
         'work': WORK,
         "working_days_number_text": [el[1] for el in WORKING_DAYS_NUMBER.values()],
     }
@@ -187,6 +187,8 @@ def grafik_update(request):
                 return render(request, 'schedule/base.html', context)
 
         # usunięcie istniejącego grafiku z bazy danych
+        # TODO removing or deletion in case of lack schedules --> 404, hould be message
+
         elif "_remove_schedule" in request.POST:
             schedule = get_object_or_404(Schedule, name=request.POST["schedule_to_edit"])
             schedule.delete()
@@ -209,7 +211,8 @@ def new_schedule(request):
         "month_calendar": month_calendar,
         "selected_month": request.session["selected_month"],
         "selected_year": request.session["selected_year"],
-        "working_days": WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1],
+        "working_days": WORKING_DAYS_NUMBER[
+            get_number_of_working_days_month(month_calendar)][1],
         "team": Team.objects.get(name=request.session["team_name"])
     })
     return render(request, 'schedule/new_schedule.html', context)
@@ -224,7 +227,8 @@ def existed_schedule(request, pk):
 
     month_calendar = current_schedule.get_month_calendar()
     one_schedules = current_schedule.oneschedule_set.all()
-    small_schedules = [[one_schedule.person.name, one_schedule.one_schedule] for one_schedule in one_schedules]
+    small_schedules = [[one_schedule.person.name, one_schedule.one_schedule]
+                       for one_schedule in one_schedules]
 
     request.session.update({
         "team_name": current_schedule.crew.name,
@@ -238,7 +242,8 @@ def existed_schedule(request, pk):
         "month_calendar": month_calendar,
         "current_schedule": current_schedule,
         "small_schedules": small_schedules,
-        "working_days": WORKING_DAYS_NUMBER[get_number_of_working_days_month(month_calendar)][1]
+        "working_days": WORKING_DAYS_NUMBER[
+            get_number_of_working_days_month(month_calendar)][1]
     })
     return render(request, 'schedule/schedule.html', context)
 
@@ -325,12 +330,14 @@ def schedule_update(request):
         crew = team_for_new_schedule.person_set.all()
 
         # odczytywanie ze strony grafiku dla poszczególnych osób
+
         schedules = []
         for person in crew:
             person_schedule = []
             for no, day in month_calendar:
-                one_day = request.POST[person.name + u'_day' + str(no)]
+                one_day = request.POST[person.name + '_day' + str(no)]
                 person_schedule.append(one_day)
+
             schedules.append(''.join(person_schedule))
 
         # zapisywanie grafiku
@@ -383,6 +390,7 @@ def schedule_update(request):
 
         else:
             # tworzenie obiektów OneSchedule wewnątrz grafiku
+
             one_schedules = [
                 OneSchedule(
                     one_schedule=person_schedule,
@@ -427,6 +435,16 @@ def schedule_update(request):
                 from .fill_schedule import fill_the_schedule
 
                 number_of_tries = 10
+
+                ###################### PRINTY
+                print("data before filling schedules ")
+                for one in one_schedules:
+                    print("one_schedule", one.person, one.one_schedule, one.schedule)
+                print("no_of_workdays", no_of_workdays)
+                print("person_per_day", person_per_day)
+                print("person_per_night", person_per_night)
+                ###################### PRINTY
+
                 while number_of_tries:
                     try:
                         new_one_schedules = fill_the_schedule(one_schedules, no_of_workdays,

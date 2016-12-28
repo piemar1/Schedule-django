@@ -19,13 +19,32 @@ from .models import *
 path = os.path.dirname(os.path.realpath(__file__)) + "/static/fonts/"
 
 # dodanie czcionki z polskimi literami
-pdfmetrics.registerFont(TTFont('Tinos-Regular', path + 'Tinos-Regular.ttf'))
-pdfmetrics.registerFont(TTFont('Tinos-Bold', path + 'Tinos-Bold.ttf'))
+
+pdfmetrics.registerFont(
+    TTFont('Tinos-Regular', path + 'Tinos-Regular.ttf')
+)
+pdfmetrics.registerFont(
+    TTFont('Tinos-Bold', path + 'Tinos-Bold.ttf')
+)
 
 styles=getSampleStyleSheet()
-style1 = ParagraphStyle(name="myStyleCenter", alignment=TA_CENTER, fontName="Tinos-Bold")
-style2 = ParagraphStyle(name="myStyleLEFT", alignment=TA_LEFT, fontName="Tinos-Regular")
-style3 = ParagraphStyle(name="myStyle", alignment=TA_CENTER, fontName="Tinos-Regular")
+
+style1 = ParagraphStyle(
+    name="myStyleCenter",
+    alignment=TA_CENTER,
+    fontName="Tinos-Bold"
+)
+
+style2 = ParagraphStyle(
+    name="myStyleLEFT",
+    alignment=TA_LEFT,
+    fontName="Tinos-Regular"
+)
+style3 = ParagraphStyle(
+    name="myStyle",
+    alignment=TA_CENTER,
+    fontName="Tinos-Regular"
+)
 
 styles.add(style1)
 styles.add(style2)

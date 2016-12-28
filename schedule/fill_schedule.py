@@ -36,7 +36,10 @@ def get_free_people(day_number, one_schedules, work, no_of_working_days):
         ]
 
     # porządkowanie lisry osób ze względeu na liczbą przydzielonych dyżurów
-    selected_person.sort(key=lambda one_schedule: one_schedule.get_working_days_number_person(), reverse=True)
+    selected_person.sort(
+        key=lambda one_schedule: one_schedule.get_working_days_number_person(),
+        reverse=True
+    )
 
     return [one_schedule.person.name for one_schedule in selected_person]
 

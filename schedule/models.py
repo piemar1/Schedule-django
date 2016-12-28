@@ -113,12 +113,12 @@ class OneSchedule(models.Model):
 
     def filtre_double_work(self, day_number, work):
         """
-        Metoda zwraca False jeśli dodanie dyżuru D lub N spowoduje powstanie dyżuru 24h ND, inaczej True
+        Metoda zwraca False jeśli dodanie dyżuru D spowoduje powstanie dyżuri 24 h ND, inaczej True
         """
         if day_number == 0 and work == NIGHT and self.one_schedule[day_number + 1] == DAY:
             return False
 
-        else:
+        elif 0 < day_number < len(self.one_schedule)-1:
             if work == NIGHT and self.one_schedule[day_number + 1] == DAY:
                 return False
 
@@ -131,7 +131,9 @@ class OneSchedule(models.Model):
         Metoda zwraca True jeśli liczba dni roboczych w one_schedule w tygodniu nie przekracza no_of_working_days,
         inaczej False.
         """
-        schedule_part = self.one_schedule[:day_number] if day_number <= 6 else self.one_schedule[day_number - 7: day_number]
+        schedule_part = self.one_schedule[:day_number] \
+            if day_number <= 6 \
+            else self.one_schedule[day_number - 7: day_number]
 
         return schedule_part.count(NIGHT) + schedule_part.count(DAY) < no_of_working_days
 
