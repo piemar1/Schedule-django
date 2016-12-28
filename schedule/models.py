@@ -33,7 +33,8 @@ class Schedule(models.Model):
 
     def get_month_calendar(self):
         """
-        Funkcja zwraca listę zawierającą informację o dniach tygodnia w kolejnych dniach miesiąca.
+        Funkcja zwraca listę zawierającą informację o
+        dniach tygodnia w kolejnych dniach miesiąca.
         """
         n = MONTHS.index(self.month) + 1
         week_day, day_no = calendar.monthrange(int(self.year), n)
@@ -45,7 +46,9 @@ class Schedule(models.Model):
             if week_day == 7:
                 week_day = 0
 
-        month_calendar = list(zip([elem + 1 for elem in range(day_no)], week_days))
+        month_calendar = list(zip(
+            [elem + 1 for elem in range(day_no)], week_days)
+        )
         return month_calendar
 
 
@@ -69,7 +72,8 @@ class OneSchedule(models.Model):
 
     def get_working_days_number_person(self):
         """
-        Funkcja zwraca liczbę dyżurów dziennych lub nocnych w ciągu miesiąca grafiku.
+        Funkcja zwraca liczbę dyżurów dziennych lub
+        nocnych w ciągu miesiąca grafiku.
         """
         return self.one_schedule.count(NIGHT) + self.one_schedule.count(DAY)
 
@@ -81,7 +85,8 @@ class OneSchedule(models.Model):
 
     def wheather_day_is_free(self, number):
         """
-        Metoda zwraca True jeśli osoba może przyjąć dyżur, False jeśli nie może przyjąć dyżuru. OK
+        Metoda zwraca True jeśli osoba może przyjąć dyżur,
+        False jeśli nie może przyjąć dyżuru. OK
         """
         return self.one_schedule[number] == FREE_DAY
 
@@ -113,28 +118,36 @@ class OneSchedule(models.Model):
 
     def filtre_double_work(self, day_number, work):
         """
-        Metoda zwraca False jeśli dodanie dyżuru D spowoduje powstanie dyżuri 24 h ND, inaczej True
+        Metoda zwraca False jeśli dodanie dyżuru
+        spowoduje powstanie dyżuri 24 h ND, inaczej True
         """
-        if day_number == 0 and work == NIGHT and self.one_schedule[day_number + 1] == DAY:
+        if day_number == 0 \
+           and work == NIGHT \
+           and self.one_schedule[day_number + 1] == DAY:
             return False
 
-        elif 0 < day_number < len(self.one_schedule)-1:
+        elif 0 < day_number <= len(self.one_schedule)-1:
             if work == NIGHT and self.one_schedule[day_number + 1] == DAY:
                 return False
 
             elif work == DAY and self.one_schedule[day_number - 1] == NIGHT:
                 return False
+
         return True
+
+
+
 
     def filtre_work_days_in_week(self, no_of_working_days, day_number):
         """
-        Metoda zwraca True jeśli liczba dni roboczych w one_schedule w tygodniu nie przekracza no_of_working_days,
-        inaczej False.
+        Metoda zwraca True jeśli liczba dni roboczych w one_schedule
+        w tygodniu nie przekracza no_of_working_days, inaczej False.
         """
         schedule_part = self.one_schedule[:day_number] \
             if day_number <= 6 \
             else self.one_schedule[day_number - 7: day_number]
 
-        return schedule_part.count(NIGHT) + schedule_part.count(DAY) < no_of_working_days
+        return schedule_part.count(NIGHT) + \
+               schedule_part.count(DAY) < no_of_working_days
 
 

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 import dj_database_url
 from .email_info import *
+import django_nose
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user_account',
     'schedule',
+    'django_nose'
 ]
 
 
@@ -151,3 +153,12 @@ STATICFILES_DIRS = (
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+# Use nose to run all tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=user_account,schedule'
+]

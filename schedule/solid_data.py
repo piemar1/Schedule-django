@@ -63,3 +63,4 @@ TYPE_OF_WORK = ("D", "N")
 NIGHT = "N"
 DAY = "D"
 FREE_DAY = "."
+HOLIDAY = "U"

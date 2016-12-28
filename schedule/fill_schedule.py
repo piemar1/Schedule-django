@@ -18,7 +18,8 @@ def get_number_of_free_worktype(day_number, one_schedules, work):
 
 def get_free_people(day_number, one_schedules, work, no_of_working_days):
     """
-    Zwraca listę osób (w postaci atrybutów person.name), które moga przyjąć dyżur -
+    Zwraca listę osób (w postaci atrybutów person.name),
+    które moga przyjąć dyżur -
     Tutaj muszą być wszystkie filtry
     - osoba bez dyżuru
     - 2 dyżury pod rząd, 24h
@@ -51,7 +52,8 @@ def get_position_of_person(person_name, one_schedules):
     return
 
 
-def fill_the_schedule(one_schedules, no_of_working_days, person_per_day, person_per_night):
+def fill_the_schedule(one_schedules, no_of_working_days,
+                      person_per_day, person_per_night):
 
     month_lenght = len(one_schedules[0].one_schedule)
 
@@ -59,34 +61,49 @@ def fill_the_schedule(one_schedules, no_of_working_days, person_per_day, person_
 
         # NIGHTS
         # liczba osób potrzebnych
-        number_of_need_night = person_per_night - get_number_of_free_worktype(day_number, one_schedules, NIGHT)
+        number_of_need_night = person_per_night - get_number_of_free_worktype(
+            day_number, one_schedules, NIGHT
+        )
 
         # tworzenie listy ludzi którzy mogą przyjąć dyżur
-        list_of_free_persons = get_free_people(day_number, one_schedules, NIGHT, no_of_working_days)
+        list_of_free_persons = get_free_people(
+            day_number,
+            one_schedules,
+            NIGHT,
+            no_of_working_days
+        )
 
         for night in range(number_of_need_night):
             # wybór osoby
             selected_person_name = list_of_free_persons.pop()
 
             # zdobycie numeru wylosowanej osoby w liście people
-            selected_person_number = get_position_of_person(selected_person_name, one_schedules)
+            selected_person_number = get_position_of_person(
+                selected_person_name, one_schedules
+            )
 
             # wprowadzenie zmiany do grafiku
             one_schedules[selected_person_number].take_work(day_number, NIGHT)
 
         # DAYS
         # liczba osób potrzebnych
-        number_of_need_days = person_per_day - get_number_of_free_worktype(day_number, one_schedules, DAY)
+        number_of_need_days = person_per_day - get_number_of_free_worktype(
+            day_number, one_schedules, DAY
+        )
 
         # tworzenie listy ludzi którzy mogą przyjąć dyżur
-        list_of_free_persons = get_free_people(day_number, one_schedules, DAY, no_of_working_days)
+        list_of_free_persons = get_free_people(
+            day_number, one_schedules, DAY, no_of_working_days
+        )
 
         for day in range(number_of_need_days):
             # wybór osoby
             selected_person_name = list_of_free_persons.pop()
 
             # zdobycie numeru wylosowanej osoby w liście people
-            selected_person_number = get_position_of_person(selected_person_name, one_schedules)
+            selected_person_number = get_position_of_person(
+                selected_person_name, one_schedules
+            )
 
             # wprowadzenie zmiany do grafiku
             one_schedules[selected_person_number].take_work(day_number, DAY)
