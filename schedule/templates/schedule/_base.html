@@ -2,94 +2,113 @@
 
 
 {% block layout %}
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'schedule/style.css' %}">
 
-<div id="main">
+<form action="{% url 'schedule:grafik_update' %}" method="post">
+{% csrf_token %}
 
-    <form action="{% url 'schedule:grafik_update' %}" method="post">
-    {% csrf_token %}
+<div id="schedule_main_table" class="container-fluid">
+    <div class="row match-my-cols">
 
-    <div id="edit_team">
-        <p style="text-align:center;" ><b>Tworzenie lub edycja składu załogi.</b></p>
-        <input type="submit" name="_new_team" value="Utwórz nową załogę">
+        <div id="empty_row1" class="col-sm-1"><p></p></div>
+        <div id="row_edit_team" class="col-sm-3">
+            <br>
+            <p><strong>Tworzenie lub edycja składu załogi.</strong></p>
+            <p>Wybierz załogę do edycji.</p>
+            <br>
+            <p>
+            <select name="edit_team"
+                       data-toggle="tooltip"
+                       data-placement="top"
+                       title="Wybierz załogę, którą chcesz edytować albo usunąć.">
+                {% if teams %}
+                   {% for team in teams %}
+                    <option value="{{team.name}}">{{team.name}}</option>
+                   {% endfor %}
+                {% else %}
+                    <option value="">Brak zespołów w bazie danych</option>
+                {% endif %}
+            </select>
+            <button type="submit" class="btn btn-default btn-md" name="_edit_team" ><b>Edytuj załogę</b></button>
+            <button type="submit" class="btn btn-warning btn-md" name="_remove_team" ><b>Usuń załogę</b></button>
+            </p><br>
+            <button type="submit" class="btn btn-success btn-md" name="_new_team" ><b>Utwórz nową załogę</b>
+            </button>
+            <br><br>
+        </div>
 
-        <p><select name="edit_team">
-            {% if teams %}
-               {% for team in teams %}
-                <option value="{{team.name}}">{{team.name}}</option>
-               {% endfor %}
-            {% else %}
-                <option value="">Brak zespołów w bazie danych</option>
-            {% endif %}
-        </select><--Wybierz załogę, którą chcesz edytować albo usunąć.</p>
-
-        <p>
-        <input type="submit" name="_edit_team" value="Edytuj załogę">
-        <input type="submit" name="_remove_team" value="Usuń załogę">
-        </p>
-    </div>
-
-    <div id="new_schedule">
-        <p style="text-align:center;" ><b>Tworzenie nowego grafiku pracy.</b></p>
-        <p>Wybierz miesiąc, rok oraz drużynę </p>
-        <p>dla której chcesz ułożyć nowy grafik.</p>
-
-        <select name="month">
-        {% for month in months %}
-            {% if month == current_month %}
-            <option value="{{month}}"SELECTED>{{month}}</option>
-            {% else %}
-            <option value="{{month}}">{{month}}</option>
-            {% endif %}
-        {% endfor %}
-        </select>
-
-        <select name="year">
-        {% for year in years %}
-            {% if year == current_year %}
-            <option value="{{year}}"SELECTED>{{year}}</option>
-            {% else %}
-            <option value="{{year}}">{{year}}</option>
-            {% endif %}
-        {% endfor %}
-        </select>
-        <select name="team_for_new_schedule">
-            {% if teams %}
-               {% for team in teams %}
-                <option value="{{team.name}}">{{team.name}}</option>
-               {% endfor %}
-            {% else %}
-                <option value="">Brak zespołów w bazie danych</option>
-            {% endif %}
-           </select>
-
-        <p><input type="submit" name="_new_schedule" value="Stwórz nowy grafik"></p>
-    </div>
-
-    <div id="edit_schedules">
-        <p style="text-align:center;" ><b>Edycja lub usunięcie istniejącego grafiku.</b></p>
-        <p>Lista istniejących już gafików do wyboru</p>
-
-        <select name="schedule_to_edit">
-            {% if schedules %}
-                {% for schedule in schedules %}
-                <option value="{{schedule.name}}">{{schedule.name}}</option>
+        <div id="row_new_schedule" class="col-sm-4">
+            <br>
+            <p><strong>Tworzenie nowego grafiku pracy.</strong></p>
+            <p>Wybierz miesiąc, rok oraz załogę dla której chcesz ułożyć nowy grafik.</p>
+            <br>
+            <p>
+            <select name="month">
+                {% for month in months %}
+                    {% if month == current_month %}
+                    <option value="{{month}}" SELECTED>{{month}}</option>
+                    {% else %}
+                    <option value="{{month}}">{{month}}</option>
+                    {% endif %}
                 {% endfor %}
-            {% else %}
-                <option value="">Brak grafików w bazie danych</option>
-            {% endif %}
-        </select>
+            </select>
+            <select name="year">
+                {% for year in years %}
+                    {% if year == current_year %}
+                    <option value="{{year}}" SELECTED>{{year}}</option>
+                    {% else %}
+                    <option value="{{year}}">{{year}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <select name="team_for_new_schedule">
+                {% if teams %}
+                   {% for team in teams %}
+                    <option value="{{team.name}}">{{team.name}}</option>
+                   {% endfor %}
+                {% else %}
+                    <option value="">Brak zespołów</option>
+                {% endif %}
+            </select></p>
+            <p><br>
+            <button type="submit" class="btn btn-success btn-md" name="_new_schedule" ><b>Utwórz nowy grafik</b>
+            </button></p>
+            <br>
+        </div>
 
-        <p></p>
-        <input type="submit" name="_edit_schedule" value="Edycja grafiku">
-        <input type="submit" name="_remove_schedule" value="Usunięcie grafiku">
+        <div id="row_edit_schedules" class="col-sm-3">
+            <br>
+            <p><strong>Edycja lub usunięcie istniejącego grafiku.</strong></p>
+            <p>Wybierz grafik do edycji.</p>
+            <br>
+            <p>
+            <select name="schedule_to_edit">
+                {% if schedules %}
+                    {% for schedule in schedules %}
+                    <option value="{{schedule.name}}">{{schedule.name}}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">Brak grafików w bazie danych</option>
+                {% endif %}
+            </select>
+            <p><br>
+            <button type="submit" name="_edit_schedule" class="btn btn-success btn-md" ><b>Edycja grafiku</b>
+            </button>
+            <button type="submit" name="_remove_schedule" class="btn btn-warning btn-md" ><b>Usunięcie grafiku</b>
+            </button></p>
+            <br>
+
+        </div>
+        <div id="empty_row2" class="col-sm-1"></div>
     </div>
-    </form>
 </div>
-
-##########################################################################################
+</form>
 
 {% if error_message %}
-    <p><strong>{{ error_message }}</strong></p>
+    <div class="alert alert-danger">
+        <strong>{{ error_message }}</strong>
+    </div>
 {% endif %}
 
     {% block body %}

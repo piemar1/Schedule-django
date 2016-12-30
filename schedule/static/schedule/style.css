@@ -1,25 +1,44 @@
 
-#flash {
-    color:green;
-    text-align:center;
-    padding:5px;
-    }
-#main {
-    background-color:#eeeeee;
-    }
+/*#flash {*/
+    /*color:green;*/
+    /*text-align:center;*/
+    /*padding:5px;*/
+    /*}*/
 
-#new_schedule {
-    background-color:#aeeee1;
-    float:left;
-    padding:5px
-    }
-#edit_team {
-    background-color:#eaeee5;
-    float:left;
-    padding:5px
-    }
-#edit_schedules {
-    background-color:#eeaee9;
-    float:left;
-    padding:5px
-    }
+
+#schedule_main_table{
+    background-color:white;
+}
+
+#row_edit_team{
+    background-color:#619EFF;
+    text-align:center;
+}
+
+#row_new_schedule{
+    background-color:#76ABFF;
+    text-align:center;
+}
+
+#row_edit_schedules {
+    background-color:#86B5FF;
+    text-align:center;
+}
+
+#new_team, #base_schedule{
+    text-align:center;
+}
+
+.alert-danger{
+    text-align:center;
+}
+
+/* make the rows the same hight*/
+.row.match-my-cols {
+    overflow: hidden;
+}
+.row.match-my-cols [class*="col-"]{
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;
+}
+

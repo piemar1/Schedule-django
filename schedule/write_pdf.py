@@ -53,7 +53,8 @@ styles.add(style3)
 
 class WritePDF:
     """
-    Klasa zawierająca potrzebne metody do zapisu grafiku schedule w postaci tabeli w pliku pdf.
+    Klasa zawierająca potrzebne metody do zapisu
+    grafiku schedule w postaci tabeli w pliku pdf.
     """
     def __init__(self, file_like_handle, year, month, one_schedules,
                  month_calendar, month_working_days, no_of_workdays):
@@ -86,7 +87,7 @@ class WritePDF:
 
         # create the frames. Here you can adjust the margins
         frame = Frame(
-            self.doc.leftMargin-65,
+            self.doc.leftMargin - 65,
             self.doc.bottomMargin - 50,
             self.doc.width + 125,
             self.doc.height + 110,

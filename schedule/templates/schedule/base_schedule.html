@@ -4,54 +4,65 @@
 <form action="{% url 'schedule:schedule_update' %}" method="post" enctype=multipart/form-data>
     {% csrf_token %}
 
-    <p> Wprowadź nazwę dla Grafiku. Domyślnie zawiera on wybrany miesiąc i rok dla tworzenia grafiku, oraz nazwę zespołu.
-    <p></p>
-    {% if current_schedule %}
-    <p><input type="text" name="schedule_name" value="{{current_schedule.name}}" size="50"></p>
-    {% elif current_schedule_name %}
-    <p><input type="text" name="schedule_name" value="{{current_schedule_name}}" size="50"></p>
-    {% else %}
-    <p><input type="text" name="schedule_name" value="{{selected_year}} {{selected_month}} {{team.name}}" size="50"></p>
-    {% endif %}
+    <div id="base_schedule">
+        <br>
+        <p> Wprowadź nazwę dla Grafiku.
+            Domyślnie zawiera on wybrany miesiąc i  rok dla tworzenia grafiku,
+            oraz nazwę zespołu. Zawsze możesz zmianić nazwę.
+        <p>
+        {% if current_schedule %}
+        <p><input type="text" name="schedule_name" value="{{current_schedule.name}}" size="50"></p>
+        {% elif current_schedule_name %}
+        <p><input type="text" name="schedule_name" value="{{current_schedule_name}}" size="50"></p>
+        {% else %}
+        <p><input type="text" name="schedule_name" value="{{selected_year}} {{selected_month}} {{team.name}}" size="50"></p>
+        {% endif %}
 
-    <p>Liczba osób na dyżurze -- w dzień>
-    <select name="no_of_person_day">
-        {% for elem in possible_no_of_person_day %}
-            {% if elem == dafoult_no_of_person_day %}
-            <option value="{{elem}}" SELECTED>{{elem}}</option>
-            {% else %}
-            <option value="{{elem}}">{{elem}}</option>
-            {% endif %}
-        {% endfor %}
-    </select></p>
+        <p>Liczba osób na dyżurze dziennym -
+        <select name="no_of_person_day">
+            {% for elem in possible_no_of_person_day %}
+                {% if elem == dafoult_no_of_person_day %}
+                <option value="{{elem}}" SELECTED>{{elem}}</option>
+                {% else %}
+                <option value="{{elem}}">{{elem}}</option>
+                {% endif %}
+            {% endfor %}
+        </select></p>
 
-    <p>Liczba osób na dyżurze -- w nocy>
-    <select name="no_of_person_night">
-        {% for elem in possible_no_of_person_night %}
-            {% if elem == dafoult_no_of_person_night %}
-            <option value="{{elem}}" SELECTED>{{elem}}</option>
-            {% else %}
-            <option value="{{elem}}">{{elem}}</option>
-            {% endif %}
-        {% endfor %}
-    </select></p>
+        <p>Liczba osób na dyżurze nocnym -
+        <select name="no_of_person_night">
+            {% for elem in possible_no_of_person_night %}
+                {% if elem == dafoult_no_of_person_night %}
+                <option value="{{elem}}" SELECTED>{{elem}}</option>
+                {% else %}
+                <option value="{{elem}}">{{elem}}</option>
+                {% endif %}
+            {% endfor %}
+        </select></p>
 
-    <p>Liczba dni roboczych w misiącu wedłóg kalendarza -->
-     <select name="no_of_working_days_in_nonth">
-        {% for elem in working_days_number_text %}
-            {% if elem == working_days %}
-            <option value="{{elem}}" SELECTED>{{elem}}</option>
-            {% else %}
-            <option value="{{elem}}">{{elem}}</option>
-            {% endif %}
-        {% endfor %}
-    </select></p>
+        <p>Liczba dni roboczych w misiącu wedłóg kalendarza -
+         <select name="no_of_working_days_in_nonth">
+            {% for elem in working_days_number_text %}
+                {% if elem == working_days %}
+                <option value="{{elem}}" SELECTED>{{elem}}</option>
+                {% else %}
+                <option value="{{elem}}">{{elem}}</option>
+                {% endif %}
+            {% endfor %}
+        </select></p>
 
-    <p>Ważne! - program domyślnie uniemożliwia wprowadzenie dużuru 24h - liczba możliwych dyżurów w ciągu 7 dni --> 4
-    <p>
-    <input type="submit" name="_fill_schedule" value="Uzupełnij Grafik Automatycznie !">
-    <input type="submit" name="_save_schedule" value="Zapisz Grafik w bazie danych">
-    <input type="submit" name="_export_schedule_as_pdf" value="Zapisz w formacie PDF">
+        <p>Ważne! - program domyślnie uniemożliwia wprowadzenie dużuru 24h - liczba możliwych dyżurów w ciągu 7 dni --> 4
+        <p>
+        <button type="submit" name="_fill_schedule" class="btn btn-success btn-md" >
+            <b>Uzupełnij Grafik Automatycznie</b>
+        </button>
+        <button type="submit" name="_save_schedule" class="btn btn-primary btn-md" >
+            <b>Zapisz Grafik w bazie danych</b>
+        </button>
+        <button type="submit" name="_export_schedule_as_pdf" class="btn btn-success btn-md" >
+            <b>Zapisz w formacie PDF</b>
+        </button>
+    </div>
 
 {% block table %} {% endblock %}
 </form>

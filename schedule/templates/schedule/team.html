@@ -1,32 +1,91 @@
 {% extends "schedule/_base.html" %}
 {% block body %}
 
+<script>
+    $(document).ready(function(){
+        var next = 1;
+
+        console.log(next);
+
+        $(".add-more").click(function(e){
+            e.preventDefault();
+            var addto = "#field" + next;
+            var addRemove = "#field" + (next);
+            next = next + 1;
+            var newIn = '<input autocomplete="off" class="input" id="field' + next + '" ' +
+                    'name="field' + next + '" type="text" placeholder="Imię Nazwisko" data-items="20"/>';
+            var newInput = $(newIn);
+            var removeBtn = '<button id="remove' + (next - 1) + '" class="btn btn-warning remove-me" >-</button></div><div id="field">';
+            var removeButton = $(removeBtn);
+            $(addto).after(newInput);
+            $(addRemove).after(removeButton);
+            $("#field" + next).attr('data-source',$(addto).attr('data-source'));
+            $("#count").val(next);
+
+            $('.remove-me').click(function(e){
+                e.preventDefault();
+                var fieldNum = this.id.charAt(this.id.length-1);
+                var fieldID = "#field" + fieldNum;
+                $(this).remove();
+                $(fieldID).remove();
+            });
+        });
+    });
+</script>
+
 <form action="{% url 'schedule:team_update' %}" method="post">
 {% csrf_token %}
 
-<p> Wprowadź nazwę dla zespołu. Domyślnie będzie ona zawierała dzisiejszą datę ale wprowadź coś od siebie. </p>
-Tutaj wpisz nazwę dla zespołu -->
+<div id="new_team">
 
-<input type="text" name="team_name" value="{{team.name}}" size="50">
-<p></p>
-<input type="submit" name="create_team" value="dodaj osobę">
-<input type="submit" name="create_team" value="odejmij osobę">
-<input type="submit" name="save_team" value="Zapisz załogę">
-<p></p>
+    <br>
+    <p> Wprowadź nazwę dla nowego zespołu.</p>
+    <p>Domyślnie będzie ona zawierała dzisiejszą datę ale dodaj coś od siebie. </p>
+
+    <input type="text" name="team_name" value="{{team.name}}" size="50">
+    <p></p>
+    <button type="submit" name="save_team" class="btn btn-success btn-md" ><b>Zapisz załogę</b>
+    </button>
+    <p></p>
 
 
-<table id="team_table" name="team_table" style="width:100%">
-    <tr>
-        <td>Liczba</td>
-        <td>Imię Nazwisko</td>
-    </tr>
-    {% for person in team.person_set.all %}
-    <tr>
-        <td>{{forloop.counter}}</td>
-        <td><input type="text" name="person{{forloop.counter0}}" value="{{person.name}}"></td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="container">
+        <div class="row">
+            <input type="hidden" name="count" value="1" />
+            <div class="control-group" id="fields">
+                <div class="controls" id="profs">
+                    <form class="input-append">
+
+                        {% for person in team.person_set.all %}
+                            <div id="fields1">
+                                <input autocomplete="off" class="input"
+                                       id="field{{forloop.counter}}"
+                                       name="field{{forloop.counter}}"
+                                       type="text"
+                                       placeholder="Imię Nazwisko"
+                                       data-items="20"
+                                       value="{{person.name}}"/>
+                                <button id="remove{{forloop.counter}}"
+                                        class="btn btn-warning remove-me"
+                                        type="button">-</button>
+                            </div>
+                        {% endfor %}
+
+                        <div id="fields2">
+                            <input autocomplete="off" class="input"
+                                   id="field{{team_plus_one}}" name="field{{team_plus_one}}" type="text"
+                                   placeholder="Imię Nazwisko" data-items="20"/>
+                            <button id="b{{team_plus_one}}" class="btn btn-success add-more" type="button">+</button>
+                        </div>
+                    </form>
+                    <br>
+                    <small>Używając +/- możesz dodać/odjąć kolejne osoby.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
 </form>
 
 {% endblock %}

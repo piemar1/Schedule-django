@@ -95,7 +95,7 @@ def main_context(request):
         'current_year': current_year(),
         'teams': get_user_teams(request),
         'schedules': get_user_schedules(request),
-        'default_team_name': today(),
+        'default_team_name': today(),  # TODO wprowadzić
         'default_schedule_name': today(),
         'dafault_team_size': DEFAULT_TEAM,
         'possible_no_of_person_night': range(10),
@@ -127,6 +127,8 @@ def new_team(request):
     return render(request, 'schedule/new_team.html', context)
 
 
+
+# TODO
 class TeamDetailView(LoginRequiredMixin, generic.TemplateView):
     """
     Generic view of existing Team.
@@ -144,6 +146,7 @@ class TeamDetailView(LoginRequiredMixin, generic.TemplateView):
             name=self.request.session["team_name_to_edit"]
         )
         context['team'] = team_to_edit
+        context['team_plus_one'] = len(team_to_edit.person_set.all())+1
         return context
 
 
@@ -286,19 +289,34 @@ def team_update(request):
 
         # zapisywanie drużyny do bazy danych
         if "save_team" in request.POST:
+
+            # PRINT
+            for k, v in request.POST.items():
+                print(k, v)
+
+
             context = main_context(request)
             try:
                 team_name = request.POST["team_name"].strip()
                 # odczytanie obecnej drużyny z widoku
                 person_list = [
                     key for key in request.POST.keys()
-                    if "person" in key
+                    if "field" in key
                     ]
+
+                # print("person list")
+                # for per in person_list:
+                #     print(per)
+
                 crew = [
                     request.POST[person].strip()
                     for person in person_list
                     if request.POST[person].strip()
                     ]
+
+                # print("crew list")
+                # for per in crew:
+                #     print(per)
 
             except KeyError:
                 # wyświetlenie strony do wprowadzenia zespołu od nowa
