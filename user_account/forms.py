@@ -1,5 +1,3 @@
-__author__ = 'Marcin Pieczyński'
-
 from django import forms
 from user_account.models import User
 
@@ -9,6 +7,7 @@ class NewUserForm(forms.ModelForm):
         model = User
         fields = ['email', 'password', 'name', 'surname']
         widgets = {'password': forms.PasswordInput()}
+        error_messages = "Pole Wymagane"
 
 
 class LogInForm(forms.Form):
@@ -22,5 +21,13 @@ class EditUserForm(forms.ModelForm):
         model = User
         fields = ['email', 'name', 'surname']
 
-    new_password_1 = forms.CharField(max_length=30, min_length=8, required=False)
-    new_password_2 = forms.CharField(max_length=30, min_length=8, required=False)
+    new_password_1 = forms.CharField(
+        max_length=30,
+        min_length=8,
+        required=False
+    )
+    new_password_2 = forms.CharField(
+        max_length=30,
+        min_length=8,
+        required=False
+    )

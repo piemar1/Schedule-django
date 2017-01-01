@@ -1,5 +1,3 @@
-__author__ = 'Marcin Pieczyński'
-
 import datetime
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser

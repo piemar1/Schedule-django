@@ -1,13 +1,16 @@
-__author__ = 'Marcin Pieczyński'
+import random
+import hashlib
 
-import random, hashlib
-
-from django.shortcuts import get_object_or_404, render_to_response, HttpResponseRedirect, render
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse_lazy
 from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import (
+    authenticate, login, logout, update_session_auth_hash
+)
+from django.shortcuts import (
+    get_object_or_404, render_to_response, HttpResponseRedirect, render
+)
 
 from .forms import NewUserForm, LogInForm, EditUserForm
 from .models import User
@@ -56,11 +59,12 @@ class NewUserView(MultiFormsView):
         new_user.save()
 
         subject = "Your Work Schedule: Confirm registration"
-        text = """
-        Hi {}, \n please confirm Your registration by clicking or copy-past this link \n
-        {}/user_account/activate/{}/ \n Please confirm with in 48 houers. Thank You for using our app.
-        \n Your Sandbox Team
-        """.format(new_user.name, HOST_NAME, new_user.activation_key)
+        text = (
+            """Hi {}, \n please confirm Your registration by clicking or
+            copy-past this link \n {}/user_account/activate/{}/ \n
+            Please confirm with in 48 houers. Thank You for using our app.
+            \n Your Sandbox Team
+            """.format(new_user.name, HOST_NAME, new_user.activation_key))
 
         send_mail(
             subject,
@@ -91,7 +95,10 @@ class NewUserView(MultiFormsView):
             self.request.session['user_is_active'] = False
             return HttpResponseRedirect('/user_account/')
         else:
-            self.request.session.update({'user_is_none': False, 'user_is_active': True})
+            self.request.session.update({
+                'user_is_none': False,
+                'user_is_active': True
+            })
             login(self.request, user)
         return HttpResponseRedirect('/schedule/')
 
@@ -105,8 +112,10 @@ def activate(request, activation_key):
         return render('user_account/activate.html', {'expired': True})
 
     profile.save(update_fields=['active', 'activation_key'])
-    return render('user_account/activate.html', {'success': True,
-                                                 'name': profile.name + " " + profile.surname})
+    return render(
+        'user_account/activate.html',
+        {'success': True, 'name': profile.name + " " + profile.surname}
+    )
 
 
 @login_required()
@@ -130,7 +139,6 @@ def edit_user_view(request):
     """
     User detail view for profile editing.
     """
-    template_name = "user_account/user_edit.html"
     form = EditUserForm(request.POST or None, instance=request.user)
 
     if form.is_valid():
@@ -141,14 +149,21 @@ def edit_user_view(request):
             request.session['new_password'] = True
 
         new_user_data.save()
-        update_session_auth_hash(request, request.user)  # enable change of user password without logout
+        # enable change of user password without logout
+        update_session_auth_hash(request, request.user)
         request.session['edit_succes'] = True
         return HttpResponseRedirect('/user_account/user_edit/')
 
-    edit_state = request.session['edit_succes'] if 'edit_succes' in request.session else None
-    new_password = request.session['new_password'] if 'new_password' in request.session else None
+    edit_state = request.session['edit_succes'] \
+        if 'edit_succes' in request.session else None
+
+    new_password = request.session['new_password'] \
+        if 'new_password' in request.session else None
+
     request.session.update({'edit_succes': None, 'new_password': None})
 
-    return render(request, template_name, {'form': form,
-                                           'edit_succes': edit_state,
-                                           'new_password': new_password})
+    return render(
+        request,
+        "user_account/user_edit.html",
+        {'form': form, 'edit_succes': edit_state, 'new_password': new_password}
+    )
