@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/python
-__author__ = 'Marcin Pieczyński'
-
-from .solid_data import *
+from . import solid_data as sd
 
 
 def get_number_of_free_worktype(day_number, one_schedules, work):
@@ -62,14 +58,14 @@ def fill_the_schedule(one_schedules, no_of_working_days,
         # NIGHTS
         # liczba osób potrzebnych
         number_of_need_night = person_per_night - get_number_of_free_worktype(
-            day_number, one_schedules, NIGHT
+            day_number, one_schedules, sd.NIGHT
         )
 
         # tworzenie listy ludzi którzy mogą przyjąć dyżur
         list_of_free_persons = get_free_people(
             day_number,
             one_schedules,
-            NIGHT,
+            sd.NIGHT,
             no_of_working_days
         )
 
@@ -83,17 +79,19 @@ def fill_the_schedule(one_schedules, no_of_working_days,
             )
 
             # wprowadzenie zmiany do grafiku
-            one_schedules[selected_person_number].take_work(day_number, NIGHT)
+            one_schedules[selected_person_number].take_work(
+                day_number, sd.NIGHT
+            )
 
         # DAYS
         # liczba osób potrzebnych
         number_of_need_days = person_per_day - get_number_of_free_worktype(
-            day_number, one_schedules, DAY
+            day_number, one_schedules, sd.DAY
         )
 
         # tworzenie listy ludzi którzy mogą przyjąć dyżur
         list_of_free_persons = get_free_people(
-            day_number, one_schedules, DAY, no_of_working_days
+            day_number, one_schedules, sd.DAY, no_of_working_days
         )
 
         for day in range(number_of_need_days):
@@ -106,6 +104,6 @@ def fill_the_schedule(one_schedules, no_of_working_days,
             )
 
             # wprowadzenie zmiany do grafiku
-            one_schedules[selected_person_number].take_work(day_number, DAY)
+            one_schedules[selected_person_number].take_work(day_number, sd.DAY)
 
     return one_schedules

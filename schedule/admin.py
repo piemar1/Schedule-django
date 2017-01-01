@@ -1,10 +1,5 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/python
-__author__ = 'Marcin Pieczyński'
-
 from django.contrib import admin
-from user_account.models import User
-from .models import Person, Team, Schedule, OneSchedule
+from .models import Person, Team, Schedule
 
 
 class PersonInLine(admin.TabularInline):
@@ -36,5 +31,3 @@ class ScheduleAdmin(admin.ModelAdmin):
 
 admin.site.register(Team, TeamAdmin)
 admin.site.register(Schedule, ScheduleAdmin)
-
-

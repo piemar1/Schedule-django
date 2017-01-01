@@ -1,15 +1,9 @@
-
-# -*- coding: utf-8 -*-
-#!/usr/bin/python
-__author__ = 'Marcin Pieczyński'
-
-
 import calendar
 
 from django.db import models
 
 from user_account.models import User
-from .solid_data import *
+from . import solid_data as sd
 
 
 class Team(models.Model):
@@ -24,8 +18,8 @@ class Schedule(models.Model):
     """Schedule model"""
     user = models.ForeignKey(User, null=True)
     name = models.CharField(max_length=200, unique=True, null=False)
-    year = models.CharField(max_length=20, choices=years)
-    month = models.CharField(max_length=20, choices=months)
+    year = models.CharField(max_length=20, choices=sd.years)
+    month = models.CharField(max_length=20, choices=sd.months)
     crew = models.ForeignKey(Team, null=False)
 
     def __str__(self):
@@ -36,12 +30,12 @@ class Schedule(models.Model):
         Funkcja zwraca listę zawierającą informację o
         dniach tygodnia w kolejnych dniach miesiąca.
         """
-        n = MONTHS.index(self.month) + 1
+        n = sd.MONTHS.index(self.month) + 1
         week_day, day_no = calendar.monthrange(int(self.year), n)
 
         week_days = []
         for day in range(day_no):
-            week_days.append(WEEK_DAYS[week_day])
+            week_days.append(sd.WEEK_DAYS[week_day])
             week_day += 1
             if week_day == 7:
                 week_day = 0
@@ -75,26 +69,28 @@ class OneSchedule(models.Model):
         Funkcja zwraca liczbę dyżurów dziennych lub
         nocnych w ciągu miesiąca grafiku.
         """
-        return self.one_schedule.count(NIGHT) + self.one_schedule.count(DAY)
+        return (
+            self.one_schedule.count(sd.NIGHT) + self.one_schedule.count(sd.DAY)
+        )
 
     def get_number_of_nights(self):
         """
         Funkcja zwraca liczbę dyżurów nocnych w ciągu miesiąca grafiku.
         """
-        return self.one_schedule.count(NIGHT)
+        return self.one_schedule.count(sd.NIGHT)
 
     def wheather_day_is_free(self, number):
         """
         Metoda zwraca True jeśli osoba może przyjąć dyżur,
         False jeśli nie może przyjąć dyżuru. OK
         """
-        return self.one_schedule[number] == FREE_DAY
+        return self.one_schedule[number] == sd.FREE_DAY
 
     def get_number_of_days(self):
         """
         Funkcja zwraca liczbę dyżurów dziennych w ciągu miesiąca grafiku.
         """
-        return self.one_schedule.count(DAY)
+        return self.one_schedule.count(sd.DAY)
 
     def take_work(self, day_number, work):
         """
@@ -122,19 +118,20 @@ class OneSchedule(models.Model):
         spowoduje powstanie dyżuri 24 h ND, inaczej True
         """
         if day_number == 0 \
-           and work == NIGHT \
-           and self.one_schedule[day_number + 1] == DAY:
+           and work == sd.NIGHT \
+           and self.one_schedule[day_number + 1] == sd.DAY:
             return False
 
         elif 0 < day_number < len(self.one_schedule)-1:
-            if work == NIGHT and self.one_schedule[day_number + 1] == DAY:
+            if work == sd.NIGHT and self.one_schedule[day_number+1] == sd.DAY:
                 return False
 
-            elif work == DAY and self.one_schedule[day_number - 1] == NIGHT:
+            elif work == sd.DAY \
+                    and self.one_schedule[day_number-1] == sd.NIGHT:
                 return False
 
         elif day_number == len(self.one_schedule) - 1:
-            if work == DAY and self.one_schedule[day_number - 1] == NIGHT:
+            if work == sd.DAY and self.one_schedule[day_number-1] == sd.NIGHT:
                 return False
         return True
 
@@ -147,5 +144,5 @@ class OneSchedule(models.Model):
             if day_number <= 6 \
             else self.one_schedule[day_number - 7: day_number]
 
-        return schedule_part.count(NIGHT) + \
-               schedule_part.count(DAY) < no_of_working_days
+        return schedule_part.count(sd.NIGHT) + \
+            schedule_part.count(sd.DAY) < no_of_working_days

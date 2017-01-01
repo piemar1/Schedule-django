@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/python
-__author__ = 'Marcin Pieczyński'
-
-
 months = (
     ("styczeń", "styczeń"),
     ("luty", "luty"),

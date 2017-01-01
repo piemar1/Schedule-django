@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/python
-__author__ = 'Marcin Pieczyński'
-
-
 import datetime
 import calendar
+import json
 
 from django.shortcuts import render, HttpResponseRedirect, get_object_or_404
 from django.core.urlresolvers import reverse
@@ -13,10 +9,9 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from user_account.models import User
 from .models import Team, Schedule, Person, OneSchedule
 from .fill_schedule import fill_the_schedule
-from .solid_data import *
+from . import solid_data as sd
 
 
 def today():
@@ -28,7 +23,7 @@ def now():
 
 
 def current_month():
-    return MONTHS[now().month-1]
+    return sd.MONTHS[now().month-1]
 
 
 def current_year():
@@ -41,12 +36,12 @@ def get_month_calendar(selected_year, selected_month):
     Funkcja zwraca listę z planem miesiąca, zawierającą informację o
     liczbie dni oraz poszczególnych dniach tygodniach.
     """
-    n = MONTHS.index(selected_month) + 1
+    n = sd.MONTHS.index(selected_month) + 1
     week_day, day_no = calendar.monthrange(selected_year, n)
 
     week_days = []
     for day in range(day_no):
-        week_days.append(WEEK_DAYS[week_day])
+        week_days.append(sd.WEEK_DAYS[week_day])
         week_day += 1
         if week_day == 7:
             week_day = 0
@@ -60,7 +55,7 @@ def get_number_of_working_days_month(month_calendar):
     """
     number = 0
     for no, day in month_calendar:
-        if day in WORKING_DAYS:
+        if day in sd.WORKING_DAYS:
             number += 1
     return number
 
@@ -70,7 +65,7 @@ def get_no_of_workdays(month_working_days):
     Funkcja zwraca liczbę dużurów do zrealizowania
     na podstawie opisu liczby dużurów w miesiącu.
     """
-    for value in WORKING_DAYS_NUMBER.values():
+    for value in sd.WORKING_DAYS_NUMBER.values():
         if month_working_days in value:
             return value[0]
     return
@@ -89,22 +84,22 @@ def main_context(request):
     Funkcja zwraca podstawową zawartość context.
     """
     default_context = {
-        'months': MONTHS,
-        'years': YEARS,
+        'months': sd.MONTHS,
+        'years': sd.YEARS,
         'current_month': current_month(),
         'current_year': current_year(),
         'teams': get_user_teams(request),
         'schedules': get_user_schedules(request),
         'default_team_name': today(),  # TODO wprowadzić
         'default_schedule_name': today(),
-        'dafault_team_size': DEFAULT_TEAM,
+        'dafault_team_size': sd.DEFAULT_TEAM,
         'possible_no_of_person_night': range(10),
         'possible_no_of_person_day': range(10),
         'dafoult_no_of_person_night': 2,
         'dafoult_no_of_person_day': 2,
-        'work': WORK,
+        'work': sd.WORK,
         "working_days_number_text":
-            [el[1] for el in WORKING_DAYS_NUMBER.values()],
+            [el[1] for el in sd.WORKING_DAYS_NUMBER.values()],
     }
     return default_context
 
@@ -124,11 +119,13 @@ def new_team(request):
     New Team view.
     """
     context = main_context(request)
+
+    js_data = json.dumps("ggggg")
+    context["team_len"] = js_data
+
     return render(request, 'schedule/new_team.html', context)
 
 
-
-# TODO
 class TeamDetailView(LoginRequiredMixin, generic.TemplateView):
     """
     Generic view of existing Team.
@@ -146,6 +143,7 @@ class TeamDetailView(LoginRequiredMixin, generic.TemplateView):
             name=self.request.session["team_name_to_edit"]
         )
         context['team'] = team_to_edit
+        context["team_len"] = len(team_to_edit.person_set.all())
         context['team_plus_one'] = len(team_to_edit.person_set.all())+1
         return context
 
@@ -215,10 +213,10 @@ def grafik_update(request):
         # TODO should be message
 
         elif "_remove_schedule" in request.POST:
-            schedule = get_object_or_404\
-                (Schedule,
-                 name=request.POST["schedule_to_edit"]
-                 )
+            schedule = get_object_or_404(
+                Schedule,
+                name=request.POST["schedule_to_edit"]
+            )
             schedule.delete()
             return HttpResponseRedirect('/schedule/')
 
@@ -244,7 +242,7 @@ def new_schedule(request):
         "month_calendar": month_calendar,
         "selected_month": request.session["selected_month"],
         "selected_year": request.session["selected_year"],
-        "working_days": WORKING_DAYS_NUMBER[
+        "working_days": sd.WORKING_DAYS_NUMBER[
             get_number_of_working_days_month(month_calendar)][1],
         "team": Team.objects.get(name=request.session["team_name"])
     })
@@ -275,7 +273,7 @@ def existed_schedule(request, pk):
         "month_calendar": month_calendar,
         "current_schedule": current_schedule,
         "small_schedules": small_schedules,
-        "working_days": WORKING_DAYS_NUMBER[
+        "working_days": sd.WORKING_DAYS_NUMBER[
             get_number_of_working_days_month(month_calendar)][1]
     })
     return render(request, 'schedule/schedule.html', context)
@@ -294,7 +292,6 @@ def team_update(request):
             for k, v in request.POST.items():
                 print(k, v)
 
-
             context = main_context(request)
             try:
                 team_name = request.POST["team_name"].strip()
@@ -303,10 +300,6 @@ def team_update(request):
                     key for key in request.POST.keys()
                     if "field" in key
                     ]
-
-                # print("person list")
-                # for per in person_list:
-                #     print(per)
 
                 crew = [
                     request.POST[person].strip()
@@ -453,7 +446,7 @@ def schedule_update(request):
                 context.update({
                     "current_schedule_name": schedule_name,
                     "month_calendar": month_calendar,
-                    "working_days": WORKING_DAYS_NUMBER[
+                    "working_days": sd.WORKING_DAYS_NUMBER[
                         get_number_of_working_days_month(month_calendar)
                     ][1],
                     "small_schedules": [
@@ -512,7 +505,7 @@ def schedule_update(request):
                 context.update({
                     "current_schedule_name": schedule_name,
                     "month_calendar": month_calendar,
-                    "working_days": WORKING_DAYS_NUMBER[
+                    "working_days": sd.WORKING_DAYS_NUMBER[
                         get_number_of_working_days_month(month_calendar)
                     ][1]
                 })

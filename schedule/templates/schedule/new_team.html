@@ -2,8 +2,13 @@
 {% extends "schedule/_base.html" %}
 {% block body %}
 
-<script>
+
+
+<script type="text/javascript">
 $(document).ready(function(){
+
+    var my_data = {{ team_len|safe }};
+    console.log(my_data);
 
     var next = 1;
     $(".add-more").click(function(e){
@@ -18,8 +23,8 @@ $(document).ready(function(){
                 + 'name="field'
                 + next
                 + '" type="text" placeholder="Imię Nazwisko" data-items="20"/>';
-
         var newInput = $(newIn);
+
         var removeBtn = '<button id="remove'
                 + (next - 1)
                 + '" class="btn btn-warning remove-me" >-</button></div><div id="field">';
@@ -27,11 +32,13 @@ $(document).ready(function(){
 
         $(addto).after(newInput);
         $(addRemove).after(removeButton);
+
         $("#field" + next).attr('data-source', $(addto).attr('data-source'));
         $("#count").val(next);
 
         $('.remove-me').click(function(e){
             e.preventDefault();
+
             var fieldNum = this.id.charAt(this.id.length-1);
             var fieldID = "#field" + fieldNum;
             $(this).remove();

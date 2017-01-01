@@ -1,25 +1,20 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/python
-__author__ = 'Marcin Pieczyński'
-
 import os
 
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.units import cm
 from reportlab.lib import colors
-from reportlab.platypus import BaseDocTemplate, Frame, Paragraph, PageTemplate, Table, Spacer, TableStyle
+from reportlab.platypus import (
+    BaseDocTemplate, Frame, Paragraph, PageTemplate, Table, Spacer, TableStyle
+)
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-from .models import *
-
 
 path = os.path.dirname(os.path.realpath(__file__)) + "/static/fonts/"
 
 # dodanie czcionki z polskimi literami
-
 pdfmetrics.registerFont(
     TTFont('Tinos-Regular', path + 'Tinos-Regular.ttf')
 )
@@ -27,7 +22,7 @@ pdfmetrics.registerFont(
     TTFont('Tinos-Bold', path + 'Tinos-Bold.ttf')
 )
 
-styles=getSampleStyleSheet()
+styles = getSampleStyleSheet()
 
 style1 = ParagraphStyle(
     name="myStyleCenter",
@@ -95,7 +90,8 @@ class WritePDF:
         )
 
         # add the PageTempaltes to the BaseDocTemplate.
-        # You can also modify those to adjust the margin if you need more control over the Frames.
+        # You can also modify those to adjust the margin
+        # if you need more control over the Frames.
         self.doc.addPageTemplates(
             PageTemplate(
                 id='first_page',
@@ -122,11 +118,13 @@ class WritePDF:
         self.story.append(p)
         self.story.append(Spacer(1, 0.5*cm))
 
-        ptext = u"{} {} ==> liczba dni roboczych w miesiącu ==> {}, " \
-                u"liczba dyżurów ==> {}".format(self.month,
-                                                self.year,
-                                                self.month_working_days,
-                                                self.no_of_workdays)
+        ptext = (
+            u"{} {} ==> liczba dni roboczych w miesiącu ==> {}, "
+            u"liczba dyżurów ==> {}".format(self.month,
+                                            self.year,
+                                            self.month_working_days,
+                                            self.no_of_workdays)
+        )
         p = Paragraph(ptext, styles['myStyleLEFT'])
         self.story.append(p)
 
@@ -147,7 +145,8 @@ class WritePDF:
         data.append(line)
 
         # zbieranie info o columnach danych dla soboty i niedzieli
-        weekend_columns = [n for n, elem in enumerate(line) if elem in ("so", "n")]
+        weekend_columns = [n for n, elem in enumerate(line)
+                           if elem in ("so", "n")]
 
         # wypełnianie tabeli dla poszczególnych osób
         for n, one_schedule in enumerate(self.one_schedules):
@@ -162,7 +161,9 @@ class WritePDF:
         row_number = len(self.one_schedules) + 2
 
         # ustawianie stylu / coloru dla soboty i niedzieli
-        color_col = [('BACKGROUND', (col, 0), (col, row_number), colors.lightgrey) for col in weekend_columns]
+        color_col = [
+            ('BACKGROUND', (col, 0), (col, row_number), colors.lightgrey)
+            for col in weekend_columns]
 
         col_width = [0.7 * cm, 3.7 * cm]
         col_width.extend(len(self.month_calendar) * [0.6 * cm])
@@ -173,16 +174,16 @@ class WritePDF:
 
         # styl tabeli
         mytablestyle = [
-            ("FONTNAME", (0,0),(-1,-1), 'Tinos-Regular'),
-            ("FONTSIZE", (0,0),(-1,-1), 8.0),
-            ("SPAN", (0,0), (0,1)),
-            ("SPAN", (1,0), (1,1)),
-            ('ALIGN',(0,0),(-1,-1),'CENTER'),
-            ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
-            ('FONTNAME', (0,0), (-1,1), 'Tinos-Bold'),
-            ('FONTNAME', (0,0), (1,-1), 'Tinos-Bold'),
-            ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-            ('BOX', (0,0), (-1,-1), 0.25, colors.black)
+            ("FONTNAME", (0, 0), (-1, -1), 'Tinos-Regular'),
+            ("FONTSIZE", (0, 0), (-1, -1), 8.0),
+            ("SPAN", (0, 0), (0, 1)),
+            ("SPAN", (1, 0), (1, 1)),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('FONTNAME', (0, 0), (-1, 1), 'Tinos-Bold'),
+            ('FONTNAME', (0, 0), (1, -1), 'Tinos-Bold'),
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (0, 0), (-1, -1), 0.25, colors.black)
         ]
 
         # dodanie do stylu tabeli kolorów dla soboty i niedzieli
@@ -194,13 +195,19 @@ class WritePDF:
         self.story.append(table)
         self.story.append(Spacer(1, 0.1*cm))
 
-        header_text = "D - liczba dyżurów dziennych, N - liczba dużurów nocnych, DN - liczba dyżurów w miesiącu"
+        header_text = (
+            "D - liczba dyżurów dziennych, "
+            "N - liczba dużurów nocnych, "
+            "DN - liczba dyżurów w miesiącu"
+        )
         p = Paragraph(header_text, styles['myStyleLEFT'])
         self.story.append(Spacer(1, 0.5*cm))
         self.story.append(p)
 
     def create_footer(self):
-        header_text = u"Grafik przygotowany w programie GrafikIwonki, kontakt marcin-pieczynski@wp.pl"
+        header_text = (
+            u"Grafik przygotowany w programie Team Work Schedule, "
+            u"kontakt marcin-pieczynski@wp.pl")
         p = Paragraph(header_text, styles['myStyle'])
         self.story.append(Spacer(1, 0.5*cm))
         self.story.append(p)

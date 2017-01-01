@@ -1,9 +1,7 @@
-
-
 from django.test import TestCase
 
 from .models import Schedule, OneSchedule
-from .solid_data import *
+from . import solid_data as sd
 
 
 class ScheduleTests(TestCase):
@@ -83,7 +81,7 @@ class OneScheduleTests(TestCase):
     def test_take_work1(self):
         """Test for method take_work for OneSchedule object - NIGHT"""
         one_schedule = create_one_chedule('...DDD...NNN...DDD...NNN...DDD')
-        one_schedule.take_work(0, NIGHT)
+        one_schedule.take_work(0, sd.NIGHT)
         self.assertEqual(
             one_schedule.one_schedule, 'N..DDD...NNN...DDD...NNN...DDD'
         )
@@ -91,7 +89,7 @@ class OneScheduleTests(TestCase):
     def test_take_work2(self):
         """Test for method take_work for OneSchedule object - DAY"""
         one_schedule = create_one_chedule('...DDD...NNN...DDD...NNN...DDD')
-        one_schedule.take_work(7, DAY)
+        one_schedule.take_work(7, sd.DAY)
         self.assertEqual(
             one_schedule.one_schedule, '...DDD.D.NNN...DDD...NNN...DDD'
         )
@@ -99,7 +97,7 @@ class OneScheduleTests(TestCase):
     def test_take_work3(self):
         """Test for method take_work for OneSchedule object - holiday"""
         one_schedule = create_one_chedule('...DDD...NNN...DDD...NNN...DDD')
-        one_schedule.take_work(13, HOLIDAY)
+        one_schedule.take_work(13, sd.HOLIDAY)
         self.assertEqual(
             one_schedule.one_schedule, '...DDD...NNN.U.DDD...NNN...DDD'
         )
@@ -113,8 +111,6 @@ class OneScheduleTests(TestCase):
         """Test for method filtre_work_days_in_month for OneSchedule object."""
         one_schedule = create_one_chedule('...DDD...NNN...DDD...NNN...DDD')
         self.assertTrue(one_schedule.filtre_work_days_in_month(15))
-
-
 
     def test_filtre_double_work1(self):
         """Test for method filtre_double_work for OneSchedule object."""
@@ -235,20 +231,3 @@ class OneScheduleTests(TestCase):
         """Test for method filtre_work_days_in_week for OneSchedule object."""
         one_schedule = create_one_chedule('.N.DDD.D.NNN...DDD...NNN...DDD')
         self.assertFalse(one_schedule.filtre_work_days_in_week(4, 10))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
