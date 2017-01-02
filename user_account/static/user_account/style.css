@@ -6,7 +6,6 @@ table#register_table,
 table#user_edition_table {
     text-align:center;
     width: 100%;
-    background-color: LightGrey ;
 }
 
 #new_user,
@@ -17,18 +16,20 @@ table#user_edition_table {
     width: 30%;
 }
 
-#inactive_user, #wrong_email_pass {
-    text-align:center;
-    color: red
+#log_user {
+    text-decoration: underline;
 }
 
 #user_activation_info,
 #user_logout_info,
-#user_is_authenticated,
 #password_edit,
 #account_edit,
 #account_creation,
-#link_after_account_edition {
+#link_after_account_edition,
+#register_button,
+#login_button,
+#row_register,
+#row_login {
     text-align:center;
 }
 
@@ -36,10 +37,9 @@ table#user_edition_table {
     text-align:right;
 }
 
-
-
-
-
+.alert-danger {
+    text-align:center;
+}
 
 #flash {
     color:green;
@@ -66,6 +66,14 @@ table#user_edition_table {
     padding:5px
     }
 
+/* make the rows the same hight*/
+.row.match-my-cols {
+    overflow: hidden;
+}
+.row.match-my-cols [class*="col-sm-"]{
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;
+}
 
 
 

@@ -1,67 +1,158 @@
 {% extends "user_account/_base.html" %}
 
 
-<!--logowanie przez obiekh bootstrao Modal-->
-
-
 {% block base_layout %}
 
-    <div id="login_or_account_creation">
+<div id="login_or_account_creation">
     {% if user.is_authenticated %}
         <div id="edit_logout_links">
-        <p><a href="{% url 'user_account:user_edit' %}">Edycja konta</a>
-            <a href="{% url 'user_account:logout' %}">Wyloguj</a>
-        </p>
-        </div>
-        <div id="user_is_authenticated">
-            <p>Witaj {{ user.name }}!</p>
+        <p>
+            <div id="log_user">
+                Zalogowany {{ user.name }} {{ user.surname }}
+            </div>
+            <a href="{% url 'user_account:user_edit' %}"><strong>Edycja konta</strong></a>
+            <a href="{% url 'user_account:logout' %}"><strong>Wyloguj</strong></a>
         </div>
 
     {% else %}
         <div id="introduction">
+        {#        TODO introduction  #}
         </div>
 
-        <form class='new_user' action="" method="post">
-        <div id="new_user">
+    <div class="container">
 
-            <table id="register_table">
-            <caption><b>Rejestracja nowego użytkownika</b></caption>
-            {% csrf_token %}
-            {{ forms.new_user.as_table }}
-            </table>
-            <button name='action' value='new_user' type="submit" onclick="sayHello()">Rejestruj</button>
+        <div class="row match-my-cols">
+
+            <div id="empty_row1" class="col-sm-1"><p></p></div>
+            <div id="row_register" class="col-sm-4">
+                <!-- Login Modal button -->
+                <div id="login_button">
+                    <br><br><br>
+                    <p>Jeśli dokonałej już rejestracji oraz aktywacji swojego konta
+                        możesz teraz zalogować się oraz w pełni korzystać z aplikacji.
+                    </p>
+                </div>
+            </div>
+            <div id="empty_row1" class="col-sm-2"><p></p></div>
+            <div id="row_login" class="col-sm-4">
+
+                <!-- Register Modal button -->
+                <div id="register_button">
+                    <br>
+                    <p> Pierwszym krokiem do korzystania z aplikacji <i>TeamWorkSchedule</i>
+                        ,umożliwiającej automatyczne przygotowywanie grafików pracy
+                        dla Twojego zespołu jest rejestracja jako nowy użytkownik.
+                        Zajmnie to tylko kilka chwil. Po rejestracji pamiętaj o aktywacji
+                        konta z wykorzystaniem linku nadesłanego w mailu.
+                    </p>
+                    <br>
+                </div>
+            </div>
+            <div id="empty_row1" class="col-sm-1"><p></p></div>
         </div>
-        </form>
+        <div class="row match-my-cols">
 
-
-        <div id="login">
-        <form class='login' action="" method="post">
-            <table id="login_table">
-            <caption><b>Logowanie</b></caption>
-            {% csrf_token %}
-            {{ forms.login.as_table }}
-            </table>
-            <button name='action' value='login' type="submit">Zaloguj</button>
-        </form>
+            <div id="empty_row1" class="col-sm-1"><p></p></div>
+                <div id="row_register" class="col-sm-4">
+                    <button type="button" class="btn btn-success btn-md"
+                            data-toggle="modal" data-target="#LoginModal">Logowanie
+                    </button>
+                </div>
+            <div id="empty_row1" class="col-sm-2"><p></p></div>
+                <div id="row_login" class="col-sm-4">
+                    <button type="button" class="btn btn-info btn-md"
+                            data-toggle="modal" data-target="#RegisterModal">
+                            Rejestracja nowego użytkownika
+                    </button>
+                </div>
+            <div id="empty_row1" class="col-sm-1"><p></p></div>
         </div>
+
+      <!-- Login Modal -->
+      <div class="modal fade" id="LoginModal" role="dialog">
+        <div class="modal-dialog">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Logowanie...</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Login Form -->
+                <div id="login">
+                    <form class='login' action="" method="post">
+                    <table id="login_table">
+                    <caption><b>Logowanie</b></caption>
+                    {% csrf_token %}
+                    {{ forms.login.as_table }}
+                    </table>
+                    <br>
+                    <button name='action' type="submit" class="btn btn-success"
+                            value='login'><strong>Zaloguj</strong>
+                    </button>
+                    </form>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register Modal -->
+      <div class="modal fade" id="RegisterModal" role="dialog">
+        <div class="modal-dialog modal-lg">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Rejestracja nowego użytkownika...</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Register Form -->
+            <div id="new_user">
+            <form class='new_user' action="" method="post">
+
+                <table id="register_table">
+                <caption><b>Rejestracja nowego użytkownika</b></caption>
+                {% csrf_token %}
+                {{ forms.new_user.as_table }}
+                </table>
+                <button name='action' type="submit" value='new_user' onclick="sayHello()"
+                        class="btn btn-success" value='login'><strong>Rejestruj</strong>
+                </button>
+            </form>
+            </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     {% endif %}
-    </div>
+    <br>
+    <br>
+</div>
 
     {% if user_is_active == False %}
-        <div id="inactive_user">
-        <p>Uwaga, użytkownik jest nieaktywny, prosze aktywować swoje konto poprzez wykorzystanie linku aktywacyjnego
-        <p>wysłanego na adres mailowy. Po aktywacji możliwe będzie zalogowanie.
+        <div class="alert alert-danger">
+            <strong>Użytkownik nieaktywny</strong>, proszę aktywować konto poprzez wykorzystanie linku aktywacyjnego
+            <p>wysłanego na adres mailowy. Po aktywacji konta możliwe będzie logowanie.
         </div>
     {% elif user_is_none == True %}
-        <div id="wrong_email_pass">
-        <p>Uwaga, wprowadzony email oraz hasło nie pasują do siebie, albo użytkownik nie został utworzony.
+        <div class="alert alert-danger">
+            <strong>Wprowadzony email oraz hasło nie pasują do siebie. </strong>
         </div>
     {% endif %}
 
     {% block layout %}
     {% endblock %}
 
-
 {% endblock %}
-
-
